@@ -1,5 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface Product {
   id: number;
@@ -19,37 +21,42 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow">
-      <figure className="overflow-hidden h-48">
+    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-slate-200">
+      <figure className="overflow-hidden h-48 bg-slate-100">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover hover:scale-105 transition-transform"
+          className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
         />
       </figure>
-      <div className="card-body">
-        <h2 className="card-title text-lg">{product.name}</h2>
-        <p className="text-sm text-gray-500">{product.category}</p>
-        <p className="text-sm line-clamp-2">{product.description}</p>
-        <div className="card-actions justify-between items-center mt-4">
-          <span className="text-2xl font-bold text-primary">${product.price}</span>
-          <div className="space-x-2">
-            <button
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg text-slate-900">{product.name}</CardTitle>
+        <CardDescription className="text-blue-600 font-semibold text-sm">{product.category}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm line-clamp-2 mb-4 text-slate-600">{product.description}</p>
+        <div className="flex justify-between items-center gap-2">
+          <span className="text-2xl font-bold text-blue-600">${product.price.toFixed(2)}</span>
+          <div className="space-x-2 flex">
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => navigate(`/product/${product.id}`)}
-              className="btn btn-ghost btn-sm"
+              className="hover:bg-slate-100 text-slate-700"
             >
               View
-            </button>
-            <button
+            </Button>
+            <Button
+              size="sm"
               onClick={() => onAddToCart(product)}
-              className="btn btn-primary btn-sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              Add to Cart
-            </button>
+              Add
+            </Button>
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

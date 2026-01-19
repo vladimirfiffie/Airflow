@@ -1,6 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Card, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import products from "@/data/products.json";
 
 export default function ProductDetail() {
@@ -13,9 +17,9 @@ export default function ProductDetail() {
       <div className="flex flex-col min-h-screen">
         <Navbar cartItemCount={0} cartSubtotal={0} />
         <main className="flex-1 p-8 flex items-center justify-center">
-          <div className="alert alert-error">
-            <span>Product not found</span>
-          </div>
+          <Alert variant="destructive">
+            <AlertDescription>Product not found</AlertDescription>
+          </Alert>
         </main>
         <Footer />
       </div>
@@ -23,40 +27,40 @@ export default function ProductDetail() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <Navbar cartItemCount={0} cartSubtotal={0} />
       <main className="flex-1 p-8">
-        <div className="max-w-4xl mx-auto">
-          <button onClick={() => navigate("/")} className="btn btn-ghost mb-6">
+        <div className="max-w-5xl mx-auto">
+          <Button variant="ghost" onClick={() => navigate("/")} className="mb-6 text-blue-600 hover:text-blue-700 hover:bg-blue-50">
             ← Back to Shopping
-          </button>
+          </Button>
           
-          <div className="card bg-base-100 shadow-lg">
-            <div className="card-body">
+          <Card className="border-slate-200 shadow-lg">
+            <CardHeader>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <figure>
-                  <img src={product.image} alt={product.name} className="w-full rounded-lg" />
+                <figure className="bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center min-h-96">
+                  <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                 </figure>
                 
                 <div>
-                  <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-                  <p className="badge badge-lg mb-4">{product.category}</p>
-                  <p className="text-gray-600 mb-6">{product.description}</p>
+                  <h1 className="text-4xl font-bold mb-3 text-slate-900">{product.name}</h1>
+                  <Badge className="mb-4 text-base bg-blue-100 text-blue-700 hover:bg-blue-100">{product.category}</Badge>
+                  <p className="text-slate-600 mb-6 text-lg leading-relaxed">{product.description}</p>
                   
-                  <div className="mb-6">
-                    <p className="text-4xl font-bold text-primary">${product.price}</p>
+                  <div className="mb-8">
+                    <p className="text-5xl font-bold text-blue-600">${product.price.toFixed(2)}</p>
                   </div>
                   
-                  <div className="space-y-4">
-                    <button className="btn btn-primary btn-block">Add to Cart</button>
-                    <button className="btn btn-outline btn-block">Buy Now</button>
+                  <div className="space-y-4 mb-8">
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg font-semibold">Add to Cart</Button>
+                    <Button variant="outline" className="w-full border-blue-600 text-blue-600 hover:bg-blue-50 py-6 text-lg font-semibold">Buy Now</Button>
                   </div>
                   
-                  <div className="divider"></div>
+                  <div className="my-8 border-t border-slate-200"></div>
                   
-                  <div className="space-y-2">
-                    <h3 className="font-bold">Features:</h3>
-                    <ul className="list-disc list-inside text-sm space-y-1">
+                  <div className="space-y-3">
+                    <h3 className="font-bold text-lg text-slate-900">Features:</h3>
+                    <ul className="list-disc list-inside text-slate-600 space-y-2">
                       <li>High quality materials</li>
                       <li>Premium design</li>
                       <li>Excellent warranty</li>
@@ -65,8 +69,8 @@ export default function ProductDetail() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </CardHeader>
+          </Card>
         </div>
       </main>
       <Footer />

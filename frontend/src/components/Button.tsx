@@ -1,29 +1,24 @@
-type ButtonVariant =
-  | "neutral"
-  | "primary"
-  | "secondary"
-  | "accent"
-  | "info"
-  | "success"
-  | "warning"
-  | "error";
+import { Button as ShadcnButton } from "@/components/ui/button";
+
+type ButtonVariant = "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
 }
 
 export default function Button({
-  variant = "primary",
+  variant = "default",
   className = "",
   children,
   ...props
 }: ButtonProps) {
   return (
-    <button
-      className={`btn btn-${variant} ${className}`}
+    <ShadcnButton
+      variant={variant}
+      className={className}
       {...props}
     >
       {children}
-    </button>
+    </ShadcnButton>
   );
 }
