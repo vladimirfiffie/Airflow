@@ -1,82 +1,100 @@
-import React from "react";
+"use client";
+import { motion } from "motion/react";
+import { LinkPreview } from "@/components/ui/link-preview";
 
-const Footer: React.FC = () => {
+const Footer = () => {
   const currentYear = new Date().getFullYear();
 
+  const coreStack = [
+    { name: "Next.js", url: "https://nextjs.org" },
+    { name: "React", url: "https://react.dev" },
+    { name: "TypeScript", url: "https://www.typescriptlang.org" },
+    { name: "TailwindCSS", url: "https://tailwindcss.com" },
+    { name: "Stripe", url: "https://stripe.com" },
+    { name: "Framer Motion", url: "https://www.framer.com/motion" },
+  ];
+
   return (
-    <footer className="bg-slate-900 text-white mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          {/* Brand */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg"></div>
-              <span className="text-xl font-bold">Store</span>
-            </div>
-            <p className="text-slate-400 text-sm">
-              Your trusted destination for quality products at great prices.
+    <footer className="relative w-full bg-background pt-14 sm:pt-20 md:pt-24 pb-8 sm:pb-10 md:pb-12 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+        {/* Main row */}
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-8 md:gap-10">
+
+          {/* Left — Branding */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col items-center md:items-start space-y-1.5"
+          >
+            <h2
+              className="font-black text-foreground tracking-tighter text-center md:text-left uppercase leading-none"
+              style={{ fontSize: "clamp(1.8rem, 5vw, 3rem)" }}
+            >
+              Airflow<span className="text-primary">.</span>
+            </h2>
+            <p className="text-foreground text-[10px] sm:text-[11px] uppercase tracking-[0.3em] font-black text-center md:text-left">
+              Your airport booking platform
             </p>
+          </motion.div>
+
+          {/* Center — Core stack (desktop) */}
+          <div className="hidden lg:flex items-center justify-center">
+            <div className="flex items-center gap-6 xl:gap-8 whitespace-nowrap">
+              {coreStack.map((tech) => (
+                <LinkPreview
+                  key={tech.name}
+                  url={tech.url}
+                  className="inline-block text-foreground text-[10px] font-black uppercase tracking-[0.2em] transition-colors border-b border-primary/0 hover:border-primary hover:text-primary"
+                >
+                  {tech.name}
+                </LinkPreview>
+              ))}
+            </div>
           </div>
 
-          {/* Company */}
-          <div>
-            <h3 className="font-bold mb-4 text-white">Company</h3>
-            <ul className="space-y-2 text-sm text-slate-400">
-              <li><a href="#" className="hover:text-white transition">About Us</a></li>
-              <li><a href="#" className="hover:text-white transition">Careers</a></li>
-              <li><a href="#" className="hover:text-white transition">Blog</a></li>
-              <li><a href="#" className="hover:text-white transition">Press</a></li>
-            </ul>
+          {/* Mobile stack */}
+          <div className="flex lg:hidden flex-wrap items-center justify-center gap-x-4 gap-y-2">
+            {coreStack.map((tech) => (
+              <a
+                key={tech.name}
+                href={tech.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/60 hover:text-primary transition-colors"
+              >
+                {tech.name}
+              </a>
+            ))}
           </div>
 
-          {/* Support */}
-          <div>
-            <h3 className="font-bold mb-4 text-white">Support</h3>
-            <ul className="space-y-2 text-sm text-slate-400">
-              <li><a href="#" className="hover:text-white transition">Help Center</a></li>
-              <li><a href="#" className="hover:text-white transition">Contact Us</a></li>
-              <li><a href="#" className="hover:text-white transition">FAQ</a></li>
-              <li><a href="#" className="hover:text-white transition">Status</a></li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h3 className="font-bold mb-4 text-white">Legal</h3>
-            <ul className="space-y-2 text-sm text-slate-400">
-              <li><a href="#" className="hover:text-white transition">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-white transition">Cookie Policy</a></li>
-              <li><a href="#" className="hover:text-white transition">Compliance</a></li>
-            </ul>
-          </div>
+          {/* Right — Customer support badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="flex flex-col items-center md:items-end"
+          >
+            <div className="flex items-center gap-2.5 px-4 sm:px-6 py-2.5 sm:py-3 border-2 border-primary bg-background shadow-[4px_4px_0px_0px_var(--primary)]">
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full bg-primary opacity-75" />
+                <span className="relative inline-flex h-2 w-2 bg-primary" />
+              </span>
+              <span className="text-primary text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] whitespace-nowrap">
+                Customer Support Available
+              </span>
+            </div>
+          </motion.div>
         </div>
 
-        <div className="border-t border-slate-800 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-slate-400 text-sm">
-              © {currentYear} Store. All rights reserved.
-            </p>
-            
-            {/* Social Icons */}
-            <div className="flex gap-6 mt-4 md:mt-0">
-              <a href="#" className="text-slate-400 hover:text-white transition" aria-label="Twitter">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" className="fill-current">
-                  <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"></path>
-                </svg>
-              </a>
-              <a href="#" className="text-slate-400 hover:text-white transition" aria-label="YouTube">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" className="fill-current">
-                  <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path>
-                </svg>
-              </a>
-              <a href="#" className="text-slate-400 hover:text-white transition" aria-label="Facebook">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" className="fill-current">
-                  <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"></path>
-                </svg>
-              </a>
-            </div>
-          </div>
+        {/* Bottom bar */}
+        <div className="mt-12 sm:mt-16 md:mt-20 pt-6 sm:pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+          <p className="text-foreground text-[10px] uppercase tracking-[0.2em] font-black text-center sm:text-left">
+            © {currentYear} Airflow<span className="text-primary">.</span> All rights reserved.
+          </p>
+          <p className="text-foreground/40 text-[9px] uppercase tracking-[0.15em] font-bold text-center sm:text-right">
+            Book smarter. Fly easier. 2026
+          </p>
         </div>
       </div>
     </footer>
