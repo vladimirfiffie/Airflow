@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///home/vlad/Documents/Personal%20Code%20Projects/Airflow/frontend/app/booking/page.tsx"],"sourcesContent":["export default function BookingPage() {\n  return (\n    <div className=\"rounded-2xl border border-slate-200 bg-white p-8 shadow-sm\">\n      <h1 className=\"text-3xl font-black tracking-tight text-slate-900\">Manage Booking</h1>\n      <p className=\"mt-2 text-slate-600\">\n        This page is intentionally frontend-only for now. Hook booking references and traveler records to backend APIs\n        when ready.\n      </p>\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;;AAAe,SAAS;IACtB,qBACE,0PAAC;QAAI,WAAU;;0BACb,0PAAC;gBAAG,WAAU;0BAAoD;;;;;;0BAClE,0PAAC;gBAAE,WAAU;0BAAsB;;;;;;;;;;;;AAMzC"}}]
-}
