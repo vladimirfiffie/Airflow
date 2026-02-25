@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from '@/pages/Home';
-import SearchPage from '@/pages/Search'; // your [id].tsx page
-import NotFound from '@/pages/404';
+import Home from '@/legacy-pages/Home';
+import SearchPage from '@/legacy-pages/Search'; // your [id].tsx page
+import NotFound from '@/legacy-pages/404';
 import './App.css';
 
 function App() {
