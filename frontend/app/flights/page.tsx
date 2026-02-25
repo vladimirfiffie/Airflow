@@ -22,7 +22,7 @@ export default function FlightsPage() {
           <div key={flight.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-sm font-semibold text-slate-500">{flight.flightNo}</p>
             <h2 className="mt-1 text-xl font-black text-slate-900">
-              {flight.fromCode} -> {flight.toCode}
+              {flight.fromCode} {"->"} {flight.toCode}
             </h2>
             <p className="mt-2 text-sm text-slate-600">
               {flight.departTime} - {flight.arriveTime} ({flight.duration})

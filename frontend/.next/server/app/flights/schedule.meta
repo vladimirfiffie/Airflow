@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/flights/layout,_N_T_/flights/schedule/layout,_N_T_/flights/schedule/page,_N_T_/flights/schedule"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/flights/schedule/__PAGE__",
+    "/flights/schedule",
+    "/flights",
+    "/_index",
+    "/_head"
+  ]
+}
