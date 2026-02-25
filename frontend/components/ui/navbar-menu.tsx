@@ -72,3 +72,51 @@ export function Menu({
     </nav>
   );
 }
+
+export function ProductItem({
+  title,
+  description,
+  href,
+  src,
+}: {
+  title: string;
+  description: string;
+  href: string;
+  src: string;
+}) {
+  return (
+    <a href={href} className="flex space-x-2">
+      <img
+        src={src}
+        width={140}
+        height={70}
+        alt={title}
+        className="shrink-0 rounded-md shadow-2xl"
+      />
+      <div>
+        <h4 className="mb-1 text-xl font-bold text-slate-900">{title}</h4>
+        <p className="max-w-[10rem] text-sm text-slate-600">{description}</p>
+      </div>
+    </a>
+  );
+}
+
+export function HoveredLink({
+  children,
+  className,
+  ...rest
+}: React.ComponentPropsWithoutRef<"a">) {
+  return (
+    <a
+      {...rest}
+      className={[
+        "text-sm text-slate-600 transition hover:text-slate-900",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {children}
+    </a>
+  );
+}

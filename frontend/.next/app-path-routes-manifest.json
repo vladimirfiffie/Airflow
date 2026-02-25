@@ -1,10 +1,10 @@
 {
-  "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",
+  "/_global-error/page": "/_global-error",
   "/booking/page": "/booking",
   "/flights/page": "/flights",
   "/flights/schedule/page": "/flights/schedule",
-  "/help/page": "/help",
+  "/page": "/",
   "/search/page": "/search",
-  "/page": "/"
+  "/help/page": "/help"
 }

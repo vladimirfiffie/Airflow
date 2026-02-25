@@ -100,7 +100,7 @@ self.__SERVER_FILES_MANIFEST={
         "transform": "lodash/{{member}}"
       }
     },
-    "outputFileTracingRoot": "/home/vlad/Documents/Personal Code Projects/Airflow",
+    "outputFileTracingRoot": "/home/vlad/Documents/Personal Code Projects/Airflow/frontend",
     "cacheComponents": false,
     "cacheLife": {
       "default": {
@@ -293,12 +293,12 @@ self.__SERVER_FILES_MANIFEST={
     "bundlePagesRouterDependencies": false,
     "configFileName": "next.config.ts",
     "turbopack": {
-      "root": "/home/vlad/Documents/Personal Code Projects/Airflow"
+      "root": "/home/vlad/Documents/Personal Code Projects/Airflow/frontend"
     },
     "distDirRoot": ".next"
   },
   "appDir": "/home/vlad/Documents/Personal Code Projects/Airflow/frontend",
-  "relativeAppDir": "frontend",
+  "relativeAppDir": "",
   "files": [
     ".next/routes-manifest.json",
     ".next/server/pages-manifest.json",
