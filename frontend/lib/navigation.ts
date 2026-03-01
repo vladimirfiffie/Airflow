@@ -16,6 +16,7 @@ export const navGroups: NavGroup[] = [
       { label: "Search Flights", href: "/search" },
       { label: "Flights Overview", href: "/flights" },
       { label: "Schedule Calendar", href: "/flights/schedule" },
+      { label: "Flight Details", href: "/flight-details" },
     ],
   },
   {

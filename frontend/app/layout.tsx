@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import NavbarMenu from "@/components/navigation/navbar-menu";
+import Footer from "@/components/footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,10 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" suppressHydrationWarning>
+      <body className="flex min-h-screen flex-col text-slate-900 antialiased dark:text-slate-100">
         <NavbarMenu />
-        <main className="mx-auto max-w-7xl px-4 py-8 md:px-6">{children}</main>
+        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 md:px-6 md:py-10">{children}</main>
+        <Footer />
       </body>
     </html>
   );

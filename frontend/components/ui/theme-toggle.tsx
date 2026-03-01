@@ -21,8 +21,8 @@ const ICONS = {
   dark: {
     icon: FiMoon,
     label: "Dark mode",
-    color: "#818cf8",
-    glow: "rgba(129,140,248,0.15)",
+    color: "#a78bfa",
+    glow: "rgba(124,58,237,0.2)",
   },
   system: {
     icon: FiMonitor,
@@ -93,7 +93,7 @@ export const ThemeToggle = () => {
     <motion.button
       onClick={cycleTheme}
       whileTap={{ scale: 0.85 }}
-      className="relative flex h-8 w-8 items-center justify-center rounded-full transition-colors duration-200"
+      className="relative flex h-8 w-8 items-center justify-center rounded-full border border-slate-300/80 transition-colors duration-200 dark:border-slate-600/80"
       style={{ color, background: glow }}
       aria-label={`Current: ${label}. Click to cycle theme.`}
       title={label}
