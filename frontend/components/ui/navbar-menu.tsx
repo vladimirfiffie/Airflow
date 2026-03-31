@@ -66,7 +66,7 @@ export function Menu({
   return (
     <nav
       onMouseLeave={() => setActive(null)}
-      className="relative flex w-full items-center gap-2 rounded-full border border-slate-200/80 bg-white/90 px-3 py-2.5 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/85"
+      className="relative flex items-center gap-4 px-1 py-1"
     >
       {children}
     </nav>

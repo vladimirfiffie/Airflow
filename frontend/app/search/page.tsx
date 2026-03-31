@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import { flightOffers } from "@/lib/mock/flights";
 
 const airportOptions = Array.from(
@@ -41,152 +42,149 @@ export default function SearchPage() {
   }, [from, maxPrice, nonStopOnly, sortBy, to]);
 
   return (
-    <div className="space-y-6">
-      <header className="rounded-3xl border border-slate-200/90 bg-white/85 p-6 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/70">
-        <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">Search Flights</h1>
-        <p className="mt-2 text-slate-600 dark:text-slate-300">
-          Filter by route and price, then open full flight details before booking.
-        </p>
-      </header>
-
-      <section className="rounded-2xl border border-slate-200/90 bg-white/90 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/70">
-        <div className="grid gap-4 md:grid-cols-5">
-          <label className="space-y-1 text-sm">
-            <span className="font-semibold text-slate-700 dark:text-slate-200">From</span>
-            <select
-              value={from}
-              onChange={(event) => setFrom(event.target.value)}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 outline-none ring-sky-300 focus:ring dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-            >
-              <option value="">Any</option>
-              {airportOptions.map((code) => (
-                <option key={code} value={code}>
-                  {code}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="space-y-1 text-sm">
-            <span className="font-semibold text-slate-700 dark:text-slate-200">To</span>
-            <select
-              value={to}
-              onChange={(event) => setTo(event.target.value)}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 outline-none ring-sky-300 focus:ring dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-            >
-              <option value="">Any</option>
-              {airportOptions.map((code) => (
-                <option key={code} value={code}>
-                  {code}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="space-y-1 text-sm">
-            <span className="font-semibold text-slate-700 dark:text-slate-200">Max Price (${maxPrice})</span>
-            <input
-              type="range"
-              min={100}
-              max={500}
-              step={10}
-              value={maxPrice}
-              onChange={(event) => setMaxPrice(Number(event.target.value))}
-              className="w-full accent-sky-600"
-            />
-          </label>
-
-          <label className="space-y-1 text-sm">
-            <span className="font-semibold text-slate-700 dark:text-slate-200">Sort By</span>
-            <select
-              value={sortBy}
-              onChange={(event) => setSortBy(event.target.value as SortKey)}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 outline-none ring-sky-300 focus:ring dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
-            >
-              <option value="price">Lowest Price</option>
-              <option value="depart">Departure Time</option>
-              <option value="duration">Shortest Duration</option>
-            </select>
-          </label>
-
-          <label className="flex items-center justify-between rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-600">
-            <span className="font-semibold text-slate-700 dark:text-slate-200">Non-stop only</span>
-            <input
-              type="checkbox"
-              checked={nonStopOnly}
-              onChange={(event) => setNonStopOnly(event.target.checked)}
-              className="h-4 w-4 accent-sky-600"
-            />
-          </label>
+    <div className="pt-24 pb-16">
+      <div className="mx-auto max-w-7xl px-4 md:px-6">
+        {/* Header */}
+        <div className="mb-10">
+          <p className="text-sm font-semibold uppercase tracking-widest text-blue-500">Discover</p>
+          <h1 className="mt-4 text-3xl font-black text-white md:text-5xl">Search Flights</h1>
+          <p className="mt-3 max-w-xl text-neutral-400">
+            Filter by route and price, compare options, and book your next trip.
+          </p>
         </div>
 
-        <div className="mt-3 flex items-center justify-between">
-          <p className="text-sm text-slate-600 dark:text-slate-300">{results.length} flights available</p>
-          <button
-            type="button"
-            onClick={() => {
-              setFrom("");
-              setTo("");
-              setMaxPrice(400);
-              setNonStopOnly(false);
-              setSortBy("price");
-            }}
-            className="rounded-full border border-slate-300 px-3 py-1 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
-          >
-            Reset Filters
-          </button>
-        </div>
-      </section>
-
-      <section className="grid gap-4">
-        {results.map((flight) => (
-          <article
-            key={flight.id}
-            className="rounded-2xl border border-slate-200/90 bg-white/90 p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-lg hover:shadow-sky-100 dark:border-slate-700 dark:bg-slate-900/70 dark:hover:border-sky-500/45 dark:hover:shadow-sky-950/30"
-          >
-            <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-              <div>
-                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
-                  {flight.airline} · {flight.flightNo}
-                </p>
-                <h2 className="mt-1 text-2xl font-black tracking-tight text-slate-900 dark:text-slate-100">
-                  {flight.fromCode} {"->"} {flight.toCode}
-                </h2>
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                  {flight.departTime} - {flight.arriveTime} · {flight.duration} ·{" "}
-                  {flight.stops === 0 ? "Non-stop" : `${flight.stops} stop`}
-                </p>
-              </div>
-
-              <div className="text-right">
-                <p className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">From</p>
-                <p className="text-3xl font-black text-sky-700 dark:text-sky-300">${flight.priceUsd}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{flight.seatsLeft} seats left</p>
-              </div>
-            </div>
-            <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
-              <Link
-                href={`/flights/${flight.id}`}
-                className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+        {/* Filters */}
+        <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-6">
+          <div className="grid gap-4 md:grid-cols-5">
+            <label className="space-y-2 text-sm">
+              <span className="font-medium text-neutral-300">From</span>
+              <select
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+                className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2.5 text-white outline-none transition focus:border-blue-500"
               >
-                View Details
-              </Link>
-              <Link
-                href="/booking"
-                className="rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-700"
-              >
-                Book Flight
-              </Link>
-            </div>
-          </article>
-        ))}
+                <option value="">Any</option>
+                {airportOptions.map((code) => (
+                  <option key={code} value={code}>{code}</option>
+                ))}
+              </select>
+            </label>
 
-        {results.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-slate-600 dark:border-slate-600 dark:text-slate-300">
-            No flights match your filters. Try widening your criteria.
+            <label className="space-y-2 text-sm">
+              <span className="font-medium text-neutral-300">To</span>
+              <select
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2.5 text-white outline-none transition focus:border-blue-500"
+              >
+                <option value="">Any</option>
+                {airportOptions.map((code) => (
+                  <option key={code} value={code}>{code}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="space-y-2 text-sm">
+              <span className="font-medium text-neutral-300">Max Price (${maxPrice})</span>
+              <input
+                type="range"
+                min={100}
+                max={500}
+                step={10}
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                className="mt-1 w-full accent-blue-500"
+              />
+            </label>
+
+            <label className="space-y-2 text-sm">
+              <span className="font-medium text-neutral-300">Sort By</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortKey)}
+                className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2.5 text-white outline-none transition focus:border-blue-500"
+              >
+                <option value="price">Lowest Price</option>
+                <option value="depart">Departure Time</option>
+                <option value="duration">Shortest Duration</option>
+              </select>
+            </label>
+
+            <label className="flex items-end gap-3 pb-1">
+              <input
+                type="checkbox"
+                checked={nonStopOnly}
+                onChange={(e) => setNonStopOnly(e.target.checked)}
+                className="h-4 w-4 rounded accent-blue-500"
+              />
+              <span className="text-sm font-medium text-neutral-300">Non-stop only</span>
+            </label>
           </div>
-        ) : null}
-      </section>
+
+          <div className="mt-4 flex items-center justify-between border-t border-neutral-800 pt-4">
+            <p className="text-sm text-neutral-500">{results.length} flights found</p>
+            <button
+              type="button"
+              onClick={() => { setFrom(""); setTo(""); setMaxPrice(400); setNonStopOnly(false); setSortBy("price"); }}
+              className="text-sm font-medium text-neutral-400 transition hover:text-white"
+            >
+              Reset Filters
+            </button>
+          </div>
+        </div>
+
+        {/* Results */}
+        <div className="mt-6 space-y-4">
+          {results.map((flight) => (
+            <div
+              key={flight.id}
+              className="group rounded-xl border border-neutral-800 bg-neutral-950 p-6 transition hover:border-blue-500/30 hover:bg-neutral-900/80"
+            >
+              <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+                <div>
+                  <p className="text-xs font-medium text-neutral-500">
+                    {flight.airline} &middot; {flight.flightNo}
+                  </p>
+                  <h2 className="mt-2 text-2xl font-black text-white">
+                    {flight.fromCode}
+                    <span className="mx-3 text-neutral-600">&rarr;</span>
+                    {flight.toCode}
+                  </h2>
+                  <p className="mt-1 text-sm text-neutral-400">
+                    {flight.departTime} - {flight.arriveTime} &middot; {flight.duration} &middot;{" "}
+                    {flight.stops === 0 ? "Non-stop" : `${flight.stops} stop`}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-3xl font-black text-blue-500">${flight.priceUsd}</p>
+                  <p className="mt-1 text-xs text-neutral-500">{flight.seatsLeft} seats left</p>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
+                <Link
+                  href={`/flights/${flight.id}`}
+                  className="rounded-lg border border-neutral-700 px-4 py-2 text-sm font-medium text-neutral-300 transition hover:border-neutral-500 hover:text-white"
+                >
+                  View Details
+                </Link>
+                <Link
+                  href="/booking"
+                  className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500"
+                >
+                  Book Flight
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          ))}
+
+          {results.length === 0 && (
+            <div className="rounded-xl border border-dashed border-neutral-700 p-12 text-center">
+              <p className="text-neutral-500">No flights match your filters. Try widening your criteria.</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

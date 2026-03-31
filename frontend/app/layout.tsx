@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import NavbarMenu from "@/components/navigation/navbar-menu";
 import Footer from "@/components/footer";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Airflow Airport",
-  description: "Frontend-first airport app built with Next.js App Router",
+  title: "Airflow",
+  description: "Next-generation flight booking platform",
 };
 
 export default function RootLayout({
@@ -15,10 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="flex min-h-screen flex-col text-slate-900 antialiased dark:text-slate-100">
-        <NavbarMenu />
-        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 md:px-6 md:py-10">{children}</main>
-        <Footer />
+      <body className="flex min-h-screen flex-col bg-white text-neutral-900 antialiased dark:bg-black dark:text-neutral-100">
+        <ThemeProvider>
+          <NavbarMenu />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
