@@ -4,15 +4,17 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { CalendarEvent } from "lucide-react";
 import { scheduleEvents } from "@/lib/mock/flights";
 
 export default function ScheduleCalendar() {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:p-6">
-      <div className="mb-4 flex items-center gap-2">
-        <CalendarEvent className="h-4 w-4 text-sky-600" />
-        <h2 className="text-base font-semibold text-slate-900">Weekly Schedule</h2>
+    <div>
+      <div className="mb-5 flex items-center justify-between">
+        <p className="eyebrow !text-neutral-500 dark:!text-neutral-400">Weekly schedule</p>
+        <p className="mono text-xs text-neutral-500 dark:text-neutral-400">
+          <span className="inline-block h-1.5 w-1.5 translate-y-[-1px] rounded-full bg-emerald-500" />{" "}
+          LIVE
+        </p>
       </div>
 
       <FullCalendar
@@ -27,8 +29,10 @@ export default function ScheduleCalendar() {
         nowIndicator
         editable={false}
         eventTimeFormat={{ hour: "2-digit", minute: "2-digit", meridiem: false }}
+        eventColor="#f97316"
+        eventTextColor="#ffffff"
         height="auto"
       />
-    </section>
+    </div>
   );
 }

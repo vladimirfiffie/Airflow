@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import NavbarMenu from "@/components/navigation/navbar-menu";
+import Footer from "@/components/footer";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Airflow Airport",
-  description: "Frontend-first airport app built with Next.js App Router",
+  title: "Airflow",
+  description: "Next-generation flight booking platform",
 };
 
 export default function RootLayout({
@@ -13,10 +15,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>
-        <NavbarMenu />
-        <main className="mx-auto max-w-7xl px-4 py-8 md:px-6">{children}</main>
+    <html lang="en" suppressHydrationWarning>
+      <body className="flex min-h-screen flex-col antialiased">
+        <ThemeProvider>
+          <NavbarMenu />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

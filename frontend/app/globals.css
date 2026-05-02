@@ -1,27 +1,181 @@
 @import "tailwindcss";
-@import "@fullcalendar/core/index.css";
-@import "@fullcalendar/daygrid/index.css";
-@import "@fullcalendar/timegrid/index.css";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+    --background: #ffffff;
+    --surface: #fafafa;
+    --surface-2: #f4f4f5;
+    --foreground: #0a0a0a;
+    --muted: #6b7280;
+    --border: #e5e5e5;
+    --border-strong: #d4d4d8;
+    --accent: #f97316;
+    --accent-hover: #ea580c;
+    --accent-soft: rgba(249, 115, 22, 0.1);
+}
+
+.dark {
+    --background: #0a0a0a;
+    --surface: #111111;
+    --surface-2: #171717;
+    --foreground: #fafafa;
+    --muted: #a1a1aa;
+    --border: #1f1f23;
+    --border-strong: #2a2a2e;
+    --accent: #fb923c;
+    --accent-hover: #f97316;
+    --accent-soft: rgba(251, 146, 60, 0.12);
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  background: radial-gradient(circle at top right, #dbeafe, transparent 35%),
-    radial-gradient(circle at bottom left, #e2e8f0, transparent 35%), var(--background);
-  color: var(--foreground);
-  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: "Plus Jakarta Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Editorial display tightening */
+.display {
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+}
+
+.display-tight {
+    letter-spacing: -0.025em;
+    line-height: 1;
+}
+
+/* Mono for flight codes, prices, numerical data */
+.mono {
+    font-family: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
+    font-feature-settings: "tnum", "zero";
+}
+
+/* Eyebrow / kicker */
+.eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+/* Subtle dot grid (kept for hero overlays only) */
+.dot-grid {
+    background-image: radial-gradient(circle, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+}
+
+.dark .dot-grid {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+}
+
+/* Grid lines for hero / section backdrops */
+.grid-lines {
+    background-image:
+        linear-gradient(to right, rgba(0, 0, 0, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.045) 1px, transparent 1px);
+    background-size: 64px 64px;
+}
+
+.dark .grid-lines {
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+/* Marquee for live status ticker */
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.marquee {
+    animation: marquee 40s linear infinite;
+}
+
+/* FullCalendar — make it fit both themes */
+.fc {
+    --fc-border-color: var(--border);
+    --fc-page-bg-color: transparent;
+    --fc-neutral-bg-color: var(--surface);
+    --fc-list-event-hover-bg-color: var(--surface-2);
+    --fc-today-bg-color: var(--accent-soft);
+    color: var(--foreground);
+}
+
+.fc .fc-toolbar-title,
+.fc .fc-col-header-cell-cushion,
+.fc .fc-timegrid-axis-cushion,
+.fc .fc-timegrid-slot-label-cushion,
+.fc .fc-daygrid-day-number {
+    color: var(--foreground);
+}
+
+.fc .fc-button-primary {
+    background-color: var(--surface-2);
+    border-color: var(--border-strong);
+    color: var(--foreground);
+    text-transform: none;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+
+.fc .fc-button-primary:not(:disabled):hover {
+    background-color: var(--border);
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+}
+
+.fc .fc-scrollgrid,
+.fc .fc-theme-standard td,
+.fc .fc-theme-standard th {
+    border-color: var(--border);
+}
+
+.fc .fc-daygrid-day,
+.fc .fc-timegrid-col {
+    background: transparent;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 8px;
+    border: 2px solid var(--background);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--muted);
 }
