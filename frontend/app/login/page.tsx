@@ -13,7 +13,10 @@ export default function LoginPage() {
       <AuthField label="Email" type="email" name="email" placeholder="name@company.com" />
       <AuthField label="Password" type="password" name="password" placeholder="Enter your password" />
       <div className="flex items-center justify-end">
-        <Link href="/forgot-password" className="text-sm font-semibold text-slate-700 hover:underline dark:text-slate-200">
+        <Link
+          href="/forgot-password"
+          className="text-sm font-bold text-neutral-700 transition hover:text-orange-500 dark:text-neutral-300"
+        >
           Forgot password?
         </Link>
       </div>

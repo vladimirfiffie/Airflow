@@ -1,94 +1,109 @@
 import Link from "next/link";
-import { Phone, Mail, Clock } from "lucide-react";
+import { Phone, Mail, Clock, ArrowRight } from "lucide-react";
 
 const faqs = [
   {
     question: "How early should I arrive at the airport?",
-    answer: "Domestic flights: at least 2 hours before departure. International flights: at least 3 hours.",
+    answer:
+      "Domestic flights: at least 2 hours before departure. International flights: at least 3 hours.",
   },
   {
     question: "Can I change my flight after booking?",
-    answer: "Yes, fare rules apply. Open Manage Booking and retrieve your trip to review available options.",
+    answer:
+      "Yes, fare rules apply. Open Manage Booking and retrieve your trip to review available options.",
   },
   {
     question: "What happens if my flight is delayed?",
-    answer: "You'll receive updates by email/SMS. Eligible delays include rebooking options and support assistance.",
+    answer:
+      "You'll receive updates by email/SMS. Eligible delays include rebooking options and support assistance.",
   },
   {
     question: "How do I request special assistance?",
-    answer: "Contact support at least 48 hours before departure so our team can prepare airport accommodations.",
+    answer:
+      "Contact support at least 48 hours before departure so our team can prepare airport accommodations.",
   },
 ];
 
 const contactCards = [
-  { icon: Phone, title: "Call", value: "+1 (800) 555-0148" },
-  { icon: Mail, title: "Email", value: "support@airflow.example" },
-  { icon: Clock, title: "Hours", value: "24/7 live assistance" },
+  { icon: Phone, title: "Call", value: "+1 (800) 555-0148", note: "24/7 support" },
+  { icon: Mail, title: "Email", value: "support@airflow.example", note: "Reply within 3h" },
+  { icon: Clock, title: "Hours", value: "Always on", note: "Live agents 24/7" },
 ];
 
 export default function HelpPage() {
   return (
-    <div className="pt-24 pb-16">
-      <div className="mx-auto max-w-7xl px-4 md:px-6">
-        {/* Header */}
-        <div className="mb-10">
-          <p className="text-sm font-semibold uppercase tracking-widest text-blue-500">Support</p>
-          <h1 className="mt-4 text-3xl font-black text-white md:text-5xl">Help Center</h1>
-          <p className="mt-3 max-w-xl text-neutral-400">
-            Find answers quickly or contact support for booking and flight assistance.
+    <div>
+      <section className="border-b border-neutral-200 dark:border-neutral-900">
+        <div className="mx-auto max-w-7xl px-4 py-16 md:px-8 md:py-24">
+          <p className="eyebrow">Support</p>
+          <h1 className="display mt-4 text-5xl font-black text-neutral-950 md:text-7xl dark:text-white">
+            Help center.
+          </h1>
+          <p className="mt-4 max-w-md text-neutral-600 dark:text-neutral-400">
+            Find answers quickly or contact a real human for booking and flight assistance.
           </p>
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/booking"
-              className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500"
+              className="inline-flex items-center gap-2 rounded-md bg-orange-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
             >
-              Manage Booking
+              Manage booking
+              <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/search"
-              className="rounded-lg border border-neutral-700 px-5 py-2.5 text-sm font-medium text-neutral-300 transition hover:border-neutral-500 hover:text-white"
+              className="rounded-md border border-neutral-300 px-5 py-3 text-sm font-bold text-neutral-900 transition hover:border-neutral-950 dark:border-neutral-800 dark:text-white dark:hover:border-white"
             >
-              Browse Flights
+              Browse flights
             </Link>
           </div>
         </div>
+      </section>
 
+      <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
         {/* Contact Cards */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-3">
           {contactCards.map((item) => (
             <div
               key={item.title}
-              className="flex items-start gap-4 rounded-xl border border-neutral-800 bg-neutral-950 p-6"
+              className="group rounded-2xl border border-neutral-200 bg-white p-6 transition-colors hover:border-orange-500 dark:border-neutral-900 dark:bg-neutral-950 dark:hover:border-orange-500"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-600/10 text-blue-500">
-                <item.icon className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">{item.title}</p>
-                <p className="mt-1 text-sm font-semibold text-white">{item.value}</p>
-              </div>
+              <item.icon className="h-6 w-6 text-orange-500" />
+              <p className="eyebrow !text-neutral-500 mt-5 dark:!text-neutral-400">{item.title}</p>
+              <p className="mono mt-2 text-lg font-bold text-neutral-950 dark:text-white">
+                {item.value}
+              </p>
+              <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">{item.note}</p>
             </div>
           ))}
         </div>
 
         {/* FAQs */}
-        <div className="mt-10 rounded-xl border border-neutral-800 bg-neutral-950 p-6">
-          <h2 className="text-xl font-black text-white">Frequently Asked Questions</h2>
-          <div className="mt-6 space-y-3">
+        <div className="mt-12">
+          <p className="eyebrow">Frequently asked</p>
+          <h2 className="display mt-4 text-4xl font-black text-neutral-950 md:text-5xl dark:text-white">
+            Common questions.
+          </h2>
+
+          <div className="mt-10 divide-y divide-neutral-200 border-t border-b border-neutral-200 dark:divide-neutral-900 dark:border-neutral-900">
             {faqs.map((faq) => (
-              <details
-                key={faq.question}
-                className="group rounded-lg border border-neutral-800 bg-neutral-900/50 px-5 py-4"
-              >
-                <summary className="cursor-pointer list-none text-sm font-semibold text-neutral-200 transition group-open:text-blue-400">
-                  {faq.question}
+              <details key={faq.question} className="group py-6">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-6">
+                  <span className="text-lg font-bold text-neutral-950 transition-colors group-open:text-orange-500 dark:text-white">
+                    {faq.question}
+                  </span>
+                  <span className="mono text-2xl font-black text-neutral-400 transition-transform group-open:rotate-45">
+                    +
+                  </span>
                 </summary>
-                <p className="mt-3 text-sm text-neutral-400">{faq.answer}</p>
+                <p className="mt-4 max-w-2xl text-neutral-600 dark:text-neutral-400">
+                  {faq.answer}
+                </p>
               </details>
             ))}
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

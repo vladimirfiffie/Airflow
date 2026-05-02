@@ -3,12 +3,28 @@
 
 :root {
     --background: #ffffff;
-    --foreground: #171717;
+    --surface: #fafafa;
+    --surface-2: #f4f4f5;
+    --foreground: #0a0a0a;
+    --muted: #6b7280;
+    --border: #e5e5e5;
+    --border-strong: #d4d4d8;
+    --accent: #f97316;
+    --accent-hover: #ea580c;
+    --accent-soft: rgba(249, 115, 22, 0.1);
 }
 
 .dark {
-    --background: #000000;
-    --foreground: #e5e5e5;
+    --background: #0a0a0a;
+    --surface: #111111;
+    --surface-2: #171717;
+    --foreground: #fafafa;
+    --muted: #a1a1aa;
+    --border: #1f1f23;
+    --border-strong: #2a2a2e;
+    --accent: #fb923c;
+    --accent-hover: #f97316;
+    --accent-soft: rgba(251, 146, 60, 0.12);
 }
 
 * {
@@ -21,36 +37,11 @@ body {
     background: var(--background);
     color: var(--foreground);
     font-family: "Plus Jakarta Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
-/* dot grid background pattern */
-.dot-grid {
-    background-image: radial-gradient(circle, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
-    background-size: 24px 24px;
-}
-
-.dark .dot-grid {
-    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
-}
-
-/* gradient text utility */
-.gradient-text {
-    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #818cf8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* glow effects */
-.glow-blue {
-    box-shadow: 0 0 60px rgba(96, 165, 250, 0.15), 0 0 120px rgba(96, 165, 250, 0.05);
-}
-
-.glow-border {
-    border-color: rgba(96, 165, 250, 0.2);
-}
-
-/* smooth scroll */
 html {
     scroll-behavior: smooth;
 }
@@ -60,57 +51,131 @@ a {
     text-decoration: none;
 }
 
-/* FullCalendar dark mode */
+/* Editorial display tightening */
+.display {
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+}
+
+.display-tight {
+    letter-spacing: -0.025em;
+    line-height: 1;
+}
+
+/* Mono for flight codes, prices, numerical data */
+.mono {
+    font-family: ui-monospace, "SF Mono", "JetBrains Mono", "Menlo", monospace;
+    font-feature-settings: "tnum", "zero";
+}
+
+/* Eyebrow / kicker */
+.eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+/* Subtle dot grid (kept for hero overlays only) */
+.dot-grid {
+    background-image: radial-gradient(circle, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+}
+
+.dark .dot-grid {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+}
+
+/* Grid lines for hero / section backdrops */
+.grid-lines {
+    background-image:
+        linear-gradient(to right, rgba(0, 0, 0, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.045) 1px, transparent 1px);
+    background-size: 64px 64px;
+}
+
+.dark .grid-lines {
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+}
+
+/* Marquee for live status ticker */
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.marquee {
+    animation: marquee 40s linear infinite;
+}
+
+/* FullCalendar — make it fit both themes */
+.fc {
+    --fc-border-color: var(--border);
+    --fc-page-bg-color: transparent;
+    --fc-neutral-bg-color: var(--surface);
+    --fc-list-event-hover-bg-color: var(--surface-2);
+    --fc-today-bg-color: var(--accent-soft);
+    color: var(--foreground);
+}
+
 .fc .fc-toolbar-title,
 .fc .fc-col-header-cell-cushion,
 .fc .fc-timegrid-axis-cushion,
-.fc .fc-timegrid-slot-label-cushion {
-    color: #e5e5e5;
+.fc .fc-timegrid-slot-label-cushion,
+.fc .fc-daygrid-day-number {
+    color: var(--foreground);
 }
 
 .fc .fc-button-primary {
-    background-color: #171717;
-    border-color: #262626;
-    color: #e5e5e5;
+    background-color: var(--surface-2);
+    border-color: var(--border-strong);
+    color: var(--foreground);
+    text-transform: none;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+
+.fc .fc-button-primary:not(:disabled):hover {
+    background-color: var(--border);
 }
 
 .fc .fc-button-primary:not(:disabled).fc-button-active,
 .fc .fc-button-primary:not(:disabled):active {
-    background-color: #1e3a5f;
-    border-color: #3b82f6;
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
 }
 
 .fc .fc-scrollgrid,
 .fc .fc-theme-standard td,
 .fc .fc-theme-standard th {
-    border-color: #262626;
+    border-color: var(--border);
 }
 
-.fc .fc-daygrid-day {
-    background: #0a0a0a;
+.fc .fc-daygrid-day,
+.fc .fc-timegrid-col {
+    background: transparent;
 }
 
-@keyframes mesh {
-    0% {
-        transform: scale(1) translate3d(0, 0, 0);
-        filter: saturate(100%);
-    }
-    50% {
-        transform: scale(1.04) translate3d(-1.5%, 1.5%, 0);
-        filter: saturate(110%);
-    }
-    100% {
-        transform: scale(1) translate3d(0, 0, 0);
-        filter: saturate(100%);
-    }
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+::-webkit-scrollbar-track {
+    background: var(--background);
 }
 
-@keyframes pulse-glow {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 0.8; }
+::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 8px;
+    border: 2px solid var(--background);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--muted);
 }

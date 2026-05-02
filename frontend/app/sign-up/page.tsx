@@ -13,9 +13,12 @@ export default function SignUpPage() {
       <AuthField label="Work Email" type="email" name="email" placeholder="name@company.com" />
       <AuthField label="Full Name" type="text" name="name" placeholder="Jane Doe" />
       <AuthField label="Password" type="password" name="password" placeholder="Create a secure password" />
-      <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-300">
+      <div className="flex items-center justify-between text-sm text-neutral-600 dark:text-neutral-400">
         <span>By continuing, you agree to our terms.</span>
-        <Link href="/help" className="font-semibold text-slate-700 hover:underline dark:text-slate-200">
+        <Link
+          href="/help"
+          className="font-bold text-neutral-900 transition hover:text-orange-500 dark:text-white"
+        >
           View policy
         </Link>
       </div>

@@ -1,151 +1,186 @@
 import Link from "next/link";
 import { ArrowRight, Globe, Shield, Zap, Clock, Plane, Search } from "lucide-react";
 import { flightOffers } from "@/lib/mock/flights";
-import HeroParallaxDemo from "@/components/hero-parallax-demo";
 import AppleCardsCarouselDemo from "@/components/apple-cards-carousel-demo";
-
-const stats = [
-  { value: "92%", label: "On-time Rate" },
-  { value: "130+", label: "Global Routes" },
-  { value: "3 min", label: "Avg Response" },
-  { value: "24/7", label: "Live Support" },
-];
-
-const features = [
-  {
-    icon: Search,
-    title: "Smart Search",
-    description: "Filter by route, price, and stops. Compare options side-by-side with real-time availability.",
-  },
-  {
-    icon: Globe,
-    title: "Global Coverage",
-    description: "Access 130+ routes across major airports. From coast-to-coast to international destinations.",
-  },
-  {
-    icon: Zap,
-    title: "Instant Booking",
-    description: "Book in seconds with streamlined checkout. No hidden fees, no surprises.",
-  },
-  {
-    icon: Shield,
-    title: "Flexible Changes",
-    description: "Change or cancel with ease. Flexible fare options for stress-free travel.",
-  },
-  {
-    icon: Clock,
-    title: "Real-time Updates",
-    description: "Live schedule tracking with gate info, delays, and boarding status at your fingertips.",
-  },
-  {
-    icon: Plane,
-    title: "Trip Management",
-    description: "Manage all bookings in one place. Update details, check policies, track flights.",
-  },
-];
+import LiveTicker from "@/components/live/live-ticker";
+import LiveStats from "@/components/live/live-stats";
+import LiveBadge from "@/components/live/live-badge";
 
 export default function HomePage() {
   return (
     <div>
-      {/* Hero Parallax */}
-      <HeroParallaxDemo />
+      {/* HERO */}
+      <section className="relative overflow-hidden border-b border-neutral-200 dark:border-neutral-900">
+        <div className="absolute inset-0 grid-lines opacity-60" aria-hidden />
+        <div className="absolute inset-x-0 top-0 h-[60%] bg-gradient-to-b from-orange-50/40 to-transparent dark:from-orange-500/[0.03]" aria-hidden />
 
-      {/* Stats Section */}
-      <section className="relative border-t border-neutral-800/80">
-        <div className="mx-auto max-w-7xl px-4 py-20 md:px-6">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <p className="text-4xl font-black gradient-text md:text-5xl">{stat.value}</p>
-                <p className="mt-2 text-sm text-neutral-500">{stat.label}</p>
-              </div>
+        <div className="relative mx-auto max-w-7xl px-4 pt-20 pb-24 md:px-8 md:pt-28 md:pb-32">
+          <LiveBadge />
+
+          <h1 className="display mt-6 text-[15vw] font-black leading-[0.9] tracking-tight text-neutral-950 md:text-[140px] dark:text-white">
+            Fly
+            <span className="text-orange-500">.</span>
+            <br />
+            <span className="text-neutral-400 dark:text-neutral-600">Smarter.</span>
+          </h1>
+
+          <p className="mt-8 max-w-xl text-lg text-neutral-600 md:text-xl dark:text-neutral-300">
+            Real-time schedules, transparent pricing, and effortless booking across 130+ routes.
+            One platform from search to gate.
+          </p>
+
+          {/* Search bar */}
+          <form
+            action="/search"
+            className="mt-10 flex max-w-2xl items-center gap-2 rounded-xl border-2 border-neutral-950 bg-white p-2 shadow-[6px_6px_0_0_#f97316] transition-shadow hover:shadow-[8px_8px_0_0_#f97316] dark:border-white dark:bg-neutral-950"
+          >
+            <Search className="ml-3 h-5 w-5 shrink-0 text-neutral-500 dark:text-neutral-400" />
+            <input
+              name="q"
+              type="text"
+              placeholder="From JFK to anywhere..."
+              className="flex-1 bg-transparent px-2 py-2 text-base font-medium text-neutral-900 placeholder-neutral-400 outline-none dark:text-white dark:placeholder-neutral-500"
+            />
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-orange-600"
+            >
+              Search
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </form>
+
+          <div className="mt-6 flex flex-wrap items-center gap-4 text-xs">
+            <span className="mono text-neutral-500 dark:text-neutral-400">POPULAR:</span>
+            {["JFK → LAX", "ORD → SEA", "MIA → BOS", "DFW → PHX"].map((route) => (
+              <Link
+                key={route}
+                href="/search"
+                className="mono rounded border border-neutral-200 px-2 py-1 font-semibold text-neutral-700 transition hover:border-orange-500 hover:text-orange-500 dark:border-neutral-800 dark:text-neutral-300"
+              >
+                {route}
+              </Link>
             ))}
           </div>
         </div>
+
+        {/* Live ticker — pulls /api/stats every 5s */}
+        <LiveTicker />
       </section>
 
-      {/* Features Grid */}
-      <section className="relative border-t border-neutral-800/80 dot-grid">
-        <div className="mx-auto max-w-7xl px-4 py-24 md:px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest text-blue-500">Everything you need</p>
-            <h2 className="mt-4 text-3xl font-black text-white md:text-5xl">
-              One platform for your <span className="gradient-text">entire journey</span>
-            </h2>
-            <p className="mt-4 text-neutral-400">
-              From search to boarding, Airflow handles every step with precision and style.
+      {/* LIVE STATS */}
+      <LiveStats />
+
+      {/* BENTO FEATURES */}
+      <section className="border-b border-neutral-200 dark:border-neutral-900">
+        <div className="mx-auto max-w-7xl px-4 py-24 md:px-8">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <p className="eyebrow">Why Airflow</p>
+              <h2 className="display mt-4 text-4xl font-black text-neutral-950 md:text-6xl dark:text-white">
+                One platform. <br />
+                <span className="text-orange-500">Every step.</span>
+              </h2>
+            </div>
+            <p className="max-w-md text-neutral-600 dark:text-neutral-400">
+              From the first search to boarding pass, every detail handled with precision.
             </p>
           </div>
 
-          <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="group rounded-xl border border-neutral-800 bg-neutral-950 p-6 transition hover:border-neutral-700 hover:bg-neutral-900/80"
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600/10 text-blue-500">
-                  <feature.icon className="h-5 w-5" />
-                </div>
-                <h3 className="mt-4 text-lg font-bold text-white">{feature.title}</h3>
-                <p className="mt-2 text-sm text-neutral-400">{feature.description}</p>
+          <div className="mt-14 grid grid-cols-1 gap-3 md:grid-cols-4 md:grid-rows-2">
+            {/* Big feature */}
+            <div className="group relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-50 p-8 md:col-span-2 md:row-span-2 md:p-10 dark:border-neutral-900 dark:bg-neutral-950">
+              <div className="absolute inset-0 grid-lines opacity-50" aria-hidden />
+              <div className="relative flex h-full flex-col">
+                <Search className="h-8 w-8 text-orange-500" />
+                <h3 className="display mt-6 text-3xl font-black text-neutral-950 md:text-4xl dark:text-white">
+                  Smart search across 130+ routes.
+                </h3>
+                <p className="mt-4 max-w-md text-neutral-600 dark:text-neutral-400">
+                  Filter by route, price, and stops. Compare options side-by-side with real-time
+                  availability — no hidden fees, no padding.
+                </p>
+                <Link
+                  href="/search"
+                  className="mt-auto inline-flex w-fit items-center gap-2 pt-10 text-sm font-bold text-neutral-950 transition group-hover:gap-3 group-hover:text-orange-500 dark:text-white"
+                >
+                  Try smart search
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-            ))}
+            </div>
+
+            <FeatureCell icon={Globe} title="Global Coverage" body="130+ routes across major airports, coast-to-coast and beyond." />
+            <FeatureCell icon={Zap} title="Instant Booking" body="Streamlined checkout. Confirmed in seconds, not minutes." />
+            <FeatureCell icon={Shield} title="Flexible Changes" body="Change or cancel with ease. Fare options for any plan." />
+            <FeatureCell icon={Clock} title="Live Tracking" body="Gate info, delays, and boarding status in real time." />
           </div>
         </div>
       </section>
 
-      {/* Destinations Carousel */}
-      <section className="border-t border-neutral-800/80">
+      {/* DESTINATIONS — keep carousel, restyled wrapper */}
+      <section className="border-b border-neutral-200 bg-white dark:border-neutral-900 dark:bg-black">
         <AppleCardsCarouselDemo />
       </section>
 
-      {/* Popular Flights */}
-      <section className="border-t border-neutral-800/80">
-        <div className="mx-auto max-w-7xl px-4 py-24 md:px-6">
+      {/* POPULAR FLIGHTS */}
+      <section className="border-b border-neutral-200 dark:border-neutral-900">
+        <div className="mx-auto max-w-7xl px-4 py-24 md:px-8">
           <div className="flex items-end justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-widest text-blue-500">Trending</p>
-              <h2 className="mt-4 text-3xl font-black text-white md:text-4xl">Popular Flights</h2>
+              <p className="eyebrow">Trending now</p>
+              <h2 className="display mt-4 text-4xl font-black text-neutral-950 md:text-6xl dark:text-white">
+                Popular flights.
+              </h2>
             </div>
             <Link
               href="/search"
-              className="hidden items-center gap-2 text-sm font-medium text-neutral-400 transition hover:text-white md:flex"
+              className="hidden items-center gap-2 text-sm font-bold text-neutral-950 transition hover:text-orange-500 md:flex dark:text-white"
             >
-              View all flights
+              View all
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-2">
+          <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-200 md:grid-cols-2 dark:border-neutral-900 dark:bg-neutral-900">
             {flightOffers.map((flight) => (
               <Link
                 key={flight.id}
                 href={`/flights/${flight.id}`}
-                className="group rounded-xl border border-neutral-800 bg-neutral-950 p-6 transition hover:border-blue-500/30 hover:bg-neutral-900/80"
+                className="group flex flex-col gap-6 bg-white p-8 transition-colors hover:bg-orange-50 dark:bg-black dark:hover:bg-orange-500/[0.04]"
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-xs font-medium text-neutral-500">
-                      {flight.flightNo} &middot; {flight.airline}
+                    <p className="mono text-xs text-neutral-500 dark:text-neutral-400">
+                      {flight.flightNo} &middot; {flight.airline.toUpperCase()}
                     </p>
-                    <p className="mt-2 text-2xl font-black text-white">
-                      {flight.fromCode}
-                      <span className="mx-3 text-neutral-600">&rarr;</span>
-                      {flight.toCode}
-                    </p>
-                    <p className="mt-1 text-sm text-neutral-400">
-                      {flight.departTime} - {flight.arriveTime} &middot; {flight.duration}
-                      {flight.stops === 0 ? " &middot; Non-stop" : ` &middot; ${flight.stops} stop`}
+                    <p className="display mt-3 text-5xl font-black text-neutral-950 dark:text-white">
+                      <span className="mono">{flight.fromCode}</span>
+                      <span className="mx-3 text-orange-500">→</span>
+                      <span className="mono">{flight.toCode}</span>
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-black text-blue-500">${flight.priceUsd}</p>
-                    <p className="mt-1 text-xs text-neutral-500">{flight.seatsLeft} seats left</p>
+                    <p className="mono text-xs text-neutral-500 dark:text-neutral-400">FROM</p>
+                    <p className="display mono mt-1 text-3xl font-black text-orange-500">
+                      ${flight.priceUsd}
+                    </p>
                   </div>
                 </div>
-                <div className="mt-4 flex items-center gap-2 text-xs font-medium text-neutral-500 transition group-hover:text-blue-400">
+
+                <div className="flex items-center justify-between text-sm">
+                  <p className="mono text-neutral-600 dark:text-neutral-400">
+                    {flight.departTime} → {flight.arriveTime} &middot; {flight.duration}
+                    {flight.stops === 0 ? " · NON-STOP" : ` · ${flight.stops} STOP`}
+                  </p>
+                  <p className="mono text-xs text-neutral-500 dark:text-neutral-400">
+                    {flight.seatsLeft} SEATS
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 border-t border-neutral-200 pt-5 text-sm font-bold text-neutral-950 transition group-hover:gap-3 group-hover:text-orange-500 dark:border-neutral-900 dark:text-white">
                   View details
-                  <ArrowRight className="h-3 w-3 transition group-hover:translate-x-1" />
+                  <ArrowRight className="h-4 w-4" />
                 </div>
               </Link>
             ))}
@@ -153,28 +188,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="border-t border-neutral-800/80">
-        <div className="mx-auto max-w-7xl px-4 py-24 md:px-6">
-          <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 p-12 text-center md:p-20">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(59,130,246,0.15),transparent_50%)]" />
+      {/* CTA */}
+      <section>
+        <div className="mx-auto max-w-7xl px-4 py-24 md:px-8 md:py-32">
+          <div className="relative overflow-hidden rounded-3xl bg-neutral-950 px-8 py-20 text-center md:px-16 md:py-28 dark:bg-neutral-950">
+            <div className="absolute inset-0 grid-lines opacity-30" aria-hidden />
+            <div className="pointer-events-none absolute -top-20 left-1/2 h-64 w-[60%] -translate-x-1/2 rounded-full bg-orange-500/30 blur-3xl" />
             <div className="relative">
-              <h2 className="text-3xl font-black text-white md:text-5xl">
-                Ready to <span className="gradient-text">take off</span>?
+              <Plane className="mx-auto h-10 w-10 text-orange-500" />
+              <h2 className="display mt-8 text-5xl font-black tracking-tight text-white md:text-7xl">
+                Ready to <span className="text-orange-500">take off</span>?
               </h2>
-              <p className="mx-auto mt-4 max-w-lg text-neutral-400">
-                Join thousands of travelers who book smarter with Airflow. Find the best routes, prices, and schedules.
+              <p className="mx-auto mt-6 max-w-lg text-neutral-300">
+                Join thousands of travelers who book smarter with Airflow.
               </p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
                 <Link
                   href="/search"
-                  className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-500"
+                  className="inline-flex items-center gap-2 rounded-lg bg-orange-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
                 >
                   Search Flights
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/sign-up"
-                  className="rounded-lg border border-neutral-700 px-6 py-3 text-sm font-semibold text-neutral-300 transition hover:border-neutral-500 hover:text-white"
+                  className="rounded-lg border border-neutral-700 px-6 py-3 text-sm font-bold text-white transition hover:border-white"
                 >
                   Create Account
                 </Link>
@@ -183,6 +221,24 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+function FeatureCell({
+  icon: Icon,
+  title,
+  body,
+}: {
+  icon: typeof Globe;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6 transition-colors hover:border-orange-500 dark:border-neutral-900 dark:bg-neutral-950 dark:hover:border-orange-500">
+      <Icon className="h-6 w-6 text-orange-500" />
+      <h3 className="mt-5 text-lg font-bold text-neutral-950 dark:text-white">{title}</h3>
+      <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">{body}</p>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plane } from "lucide-react";
 import { flightOffers } from "@/lib/mock/flights";
 
 const gateByFlight: Record<string, string> = {
@@ -30,100 +30,127 @@ export default async function FlightDetailPage({
   }
 
   const rows = [
-    { label: "Flight Number", value: flight.flightNo },
-    { label: "Airline", value: flight.airline },
-    { label: "Departure", value: `${flight.fromCode} at ${flight.departTime}` },
-    { label: "Arrival", value: `${flight.toCode} at ${flight.arriveTime}` },
+    { label: "Flight", value: flight.flightNo },
+    { label: "Operator", value: flight.airline },
+    { label: "Departure", value: `${flight.fromCode} · ${flight.departTime}` },
+    { label: "Arrival", value: `${flight.toCode} · ${flight.arriveTime}` },
     { label: "Duration", value: flight.duration },
     { label: "Stops", value: flight.stops === 0 ? "Non-stop" : `${flight.stops}` },
     { label: "Gate", value: gateByFlight[flight.flightNo] ?? "TBD" },
     { label: "Aircraft", value: aircraftByFlight[flight.flightNo] ?? "TBD" },
-    { label: "Seats Left", value: `${flight.seatsLeft}` },
+    { label: "Seats left", value: `${flight.seatsLeft}` },
   ];
 
   return (
-    <div className="pt-24 pb-16">
-      <div className="mx-auto max-w-4xl px-4 md:px-6">
-        {/* Header */}
-        <div className="mb-10">
-          <p className="text-sm font-semibold uppercase tracking-widest text-blue-500">Flight Details</p>
-          <h1 className="mt-4 text-3xl font-black text-white md:text-5xl">
-            {flight.fromCode}
-            <span className="mx-4 text-neutral-600">&rarr;</span>
-            {flight.toCode}
+    <div>
+      {/* Hero header — airline-info-screen feel */}
+      <section className="relative overflow-hidden border-b border-neutral-200 dark:border-neutral-900">
+        <div className="absolute inset-0 grid-lines opacity-50" aria-hidden />
+        <div className="relative mx-auto max-w-5xl px-4 py-16 md:px-8 md:py-24">
+          <Link
+            href="/search"
+            className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 transition hover:text-orange-500 dark:text-neutral-400"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to search
+          </Link>
+
+          <p className="mono mt-10 text-xs text-neutral-500 dark:text-neutral-400">
+            {flight.flightNo} · {flight.airline.toUpperCase()}
+          </p>
+
+          <h1 className="display mt-4 text-6xl font-black text-neutral-950 md:text-[120px] dark:text-white">
+            <span className="mono">{flight.fromCode}</span>
+            <span className="mx-3 text-orange-500 md:mx-6">→</span>
+            <span className="mono">{flight.toCode}</span>
           </h1>
-          <p className="mt-3 text-neutral-400">
-            Flight {flight.flightNo} &middot; {flight.airline}
+
+          <p className="mono mt-6 text-sm text-neutral-600 dark:text-neutral-400">
+            {flight.departTime} → {flight.arriveTime} · {flight.duration} ·{" "}
+            {flight.stops === 0 ? "NON-STOP" : `${flight.stops} STOP`}
           </p>
         </div>
+      </section>
 
-        {/* Price Banner */}
-        <div className="mb-6 flex items-center justify-between rounded-xl border border-blue-500/20 bg-blue-500/5 p-6">
+      <section className="mx-auto max-w-5xl px-4 py-12 md:px-8">
+        {/* Price banner */}
+        <div className="flex flex-col items-start justify-between gap-6 rounded-2xl bg-neutral-950 p-8 text-white md:flex-row md:items-center md:p-10">
           <div>
-            <p className="text-sm text-neutral-400">Starting from</p>
-            <p className="text-4xl font-black text-blue-500">${flight.priceUsd}</p>
+            <p className="mono text-xs text-neutral-400">FROM</p>
+            <p className="display mono mt-1 text-6xl font-black text-orange-500 md:text-7xl">
+              ${flight.priceUsd}
+            </p>
+            <p className="mt-2 mono text-xs text-neutral-400">
+              {flight.seatsLeft} SEATS REMAINING
+            </p>
           </div>
           <Link
-            href="/booking"
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-500"
+            href={`/booking/${flight.id}`}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-orange-500 px-8 py-4 text-base font-bold text-white transition hover:bg-orange-600 md:w-auto"
           >
-            Book This Flight
-            <ArrowRight className="h-4 w-4" />
+            Book this flight
+            <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
 
-        {/* Flight Info Table */}
-        <div className="overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950">
+        {/* Info table */}
+        <div className="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-900 dark:bg-neutral-950">
           {rows.map((row, i) => (
             <div
               key={row.label}
-              className={`flex items-center justify-between px-6 py-4 ${
-                i < rows.length - 1 ? "border-b border-neutral-800" : ""
+              className={`flex items-center justify-between px-6 py-5 ${
+                i < rows.length - 1
+                  ? "border-b border-neutral-200 dark:border-neutral-900"
+                  : ""
               }`}
             >
-              <span className="text-sm font-medium text-neutral-500">{row.label}</span>
-              <span className="text-sm font-semibold text-white">{row.value}</span>
+              <span className="mono text-xs text-neutral-500 uppercase tracking-widest dark:text-neutral-400">
+                {row.label}
+              </span>
+              <span className="mono text-sm font-bold text-neutral-950 dark:text-white">
+                {row.value}
+              </span>
             </div>
           ))}
         </div>
 
-        {/* Policy Cards */}
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        {/* Policy cards */}
+        <div className="mt-6 grid gap-3 md:grid-cols-3">
           {[
-            { title: "Carry-on", value: "1 personal item + 1 cabin bag" },
-            { title: "Checked Bag", value: "$35 each way (first bag)" },
-            { title: "Changes", value: "Flexible changes up to 24h before" },
+            { title: "Carry-on", value: "1 personal + 1 cabin bag" },
+            { title: "Checked bag", value: "$35 first bag, each way" },
+            { title: "Changes", value: "Flexible up to 24h before" },
           ].map((item) => (
             <div
               key={item.title}
-              className="rounded-xl border border-neutral-800 bg-neutral-950 p-5"
+              className="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-900 dark:bg-neutral-950"
             >
-              <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">
-                {item.title}
+              <p className="eyebrow !text-neutral-500 dark:!text-neutral-400">{item.title}</p>
+              <p className="mt-3 text-sm font-bold text-neutral-950 dark:text-white">
+                {item.value}
               </p>
-              <p className="mt-2 text-sm text-neutral-300">{item.value}</p>
             </div>
           ))}
         </div>
 
-        {/* Actions */}
-        <div className="mt-8 flex flex-wrap gap-3">
+        {/* Bottom actions */}
+        <div className="mt-10 flex flex-wrap gap-3">
           <Link
             href="/search"
-            className="inline-flex items-center gap-2 rounded-lg border border-neutral-700 px-4 py-2.5 text-sm font-medium text-neutral-300 transition hover:border-neutral-500 hover:text-white"
+            className="inline-flex items-center gap-2 rounded-md border border-neutral-300 px-5 py-3 text-sm font-bold text-neutral-900 transition hover:border-neutral-950 dark:border-neutral-800 dark:text-white dark:hover:border-white"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Search
+            Back to search
           </Link>
           <Link
-            href="/booking"
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500"
+            href={`/booking/${flight.id}`}
+            className="inline-flex items-center gap-2 rounded-md bg-orange-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
           >
-            Continue to Booking
-            <ArrowRight className="h-4 w-4" />
+            Continue to booking
+            <Plane className="h-4 w-4" />
           </Link>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

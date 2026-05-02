@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="flex min-h-screen flex-col bg-white text-neutral-900 antialiased dark:bg-black dark:text-neutral-100">
+      <body className="flex min-h-screen flex-col antialiased">
         <ThemeProvider>
           <NavbarMenu />
           <main className="flex-1">{children}</main>

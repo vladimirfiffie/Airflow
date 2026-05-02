@@ -27,50 +27,66 @@ const flights = [
 
 export default function FlightDetailsPage() {
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-7xl space-y-10 px-4 py-16 md:px-8 md:py-24">
       <div>
-        <p className="text-sm font-semibold uppercase tracking-widest text-blue-500">Routes</p>
-        <h1 className="mt-4 text-3xl font-black text-white md:text-5xl">Flight Details</h1>
-        <p className="mt-3 text-neutral-400">
+        <p className="eyebrow">Routes</p>
+        <h1 className="display mt-4 text-5xl font-black text-neutral-950 md:text-7xl dark:text-white">
+          Flight details.
+        </h1>
+        <p className="mt-4 max-w-md text-neutral-600 dark:text-neutral-400">
           Structured flight data with routes, times, and locations.
         </p>
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-lg border border-neutral-700 px-4 py-2.5 text-sm font-medium text-neutral-300 transition hover:border-neutral-500 hover:text-white"
+            className="inline-flex items-center gap-2 rounded-md border border-neutral-300 px-5 py-3 text-sm font-bold text-neutral-900 transition hover:border-neutral-950 dark:border-neutral-800 dark:text-white dark:hover:border-white"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back Home
+            Back home
           </Link>
           <Link
             href="/search"
-            className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500"
+            className="rounded-md bg-orange-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
           >
-            Search Flights
+            Search flights
           </Link>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950">
+      <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-900 dark:bg-neutral-950">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[700px] border-collapse text-sm">
+          <table className="mono w-full min-w-[700px] border-collapse text-sm">
             <thead>
-              <tr className="border-b border-neutral-800">
-                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-widest text-neutral-500">Flight</th>
-                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-widest text-neutral-500">Departure</th>
-                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-widest text-neutral-500">Arrival</th>
-                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-widest text-neutral-500">From</th>
-                <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-widest text-neutral-500">To</th>
+              <tr className="border-b border-neutral-200 dark:border-neutral-900">
+                {["Flight", "Departure", "Arrival", "From", "To"].map((h) => (
+                  <th
+                    key={h}
+                    className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400"
+                  >
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {flights.map((flight) => (
-                <tr key={flight.flightNumber} className="border-t border-neutral-800/50">
-                  <td className="px-5 py-4 font-semibold text-white">{flight.flightNumber}</td>
-                  <td className="px-5 py-4 text-neutral-300">{flight.departureTime}</td>
-                  <td className="px-5 py-4 text-neutral-300">{flight.arrivalTime}</td>
-                  <td className="px-5 py-4 text-neutral-300">{flight.departureLocation}</td>
-                  <td className="px-5 py-4 text-neutral-300">{flight.destinationLocation}</td>
+                <tr
+                  key={flight.flightNumber}
+                  className="border-t border-neutral-200 transition hover:bg-orange-50 dark:border-neutral-900 dark:hover:bg-orange-500/[0.04]"
+                >
+                  <td className="px-5 py-5 font-bold text-orange-500">{flight.flightNumber}</td>
+                  <td className="px-5 py-5 text-neutral-700 dark:text-neutral-300">
+                    {flight.departureTime}
+                  </td>
+                  <td className="px-5 py-5 text-neutral-700 dark:text-neutral-300">
+                    {flight.arrivalTime}
+                  </td>
+                  <td className="px-5 py-5 text-neutral-700 dark:text-neutral-300">
+                    {flight.departureLocation}
+                  </td>
+                  <td className="px-5 py-5 text-neutral-700 dark:text-neutral-300">
+                    {flight.destinationLocation}
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Plane } from "lucide-react";
 
 const productLinks = [
   { label: "Search Flights", href: "/search" },
@@ -23,29 +22,37 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-neutral-800/80 bg-black">
-      <div className="mx-auto max-w-7xl px-4 py-16 md:px-6">
-        <div className="grid gap-10 md:grid-cols-4">
+    <footer className="border-t border-neutral-200 bg-white dark:border-neutral-900 dark:bg-black">
+      <div className="mx-auto max-w-7xl px-4 py-20 md:px-8">
+        {/* Massive wordmark */}
+        <div className="border-b border-neutral-200 pb-12 dark:border-neutral-900">
+          <p className="display text-[18vw] font-black leading-none tracking-tight text-neutral-950 md:text-[160px] dark:text-white">
+            Airflow<span className="text-orange-500">.</span>
+          </p>
+          <p className="mt-6 max-w-md text-sm text-neutral-500 dark:text-neutral-400">
+            Next-generation flight booking with seamless scheduling, real-time tracking, and effortless management.
+          </p>
+        </div>
+
+        <div className="grid gap-10 pt-12 md:grid-cols-4">
           <div>
-            <Link href="/" className="flex items-center gap-2 text-lg font-black">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-                <Plane className="h-4 w-4 text-white" />
-              </div>
-              Airflow<span className="text-blue-500">.</span>
-            </Link>
-            <p className="mt-4 max-w-xs text-sm text-neutral-500">
-              Next-generation flight booking with seamless scheduling, real-time tracking, and effortless management.
+            <p className="eyebrow">Direct</p>
+            <p className="mt-4 mono text-sm text-neutral-700 dark:text-neutral-300">
+              +1 (800) 555-0148
+            </p>
+            <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
+              support@airflow.example
             </p>
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">Product</p>
+            <p className="eyebrow">Product</p>
             <nav className="mt-4 flex flex-col gap-2.5">
               {productLinks.map((item) => (
                 <Link
                   key={item.href + item.label}
                   href={item.href}
-                  className="text-sm text-neutral-400 transition hover:text-white"
+                  className="text-sm text-neutral-700 transition hover:text-orange-500 dark:text-neutral-300 dark:hover:text-orange-400"
                 >
                   {item.label}
                 </Link>
@@ -54,13 +61,13 @@ export default function Footer() {
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">Support</p>
+            <p className="eyebrow">Support</p>
             <nav className="mt-4 flex flex-col gap-2.5">
               {supportLinks.map((item) => (
                 <Link
                   key={item.href + item.label}
                   href={item.href}
-                  className="text-sm text-neutral-400 transition hover:text-white"
+                  className="text-sm text-neutral-700 transition hover:text-orange-500 dark:text-neutral-300 dark:hover:text-orange-400"
                 >
                   {item.label}
                 </Link>
@@ -69,13 +76,13 @@ export default function Footer() {
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-500">Legal</p>
+            <p className="eyebrow">Legal</p>
             <nav className="mt-4 flex flex-col gap-2.5">
               {legalLinks.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="text-sm text-neutral-400 transition hover:text-white"
+                  className="text-sm text-neutral-700 transition hover:text-orange-500 dark:text-neutral-300 dark:hover:text-orange-400"
                 >
                   {item.label}
                 </Link>
@@ -84,9 +91,14 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-neutral-800/80 pt-8 md:flex-row">
-          <p className="text-xs text-neutral-600">&copy; {year} Airflow. All rights reserved.</p>
-          <p className="text-xs text-neutral-600">Built with Next.js &amp; Tailwind CSS</p>
+        <div className="mt-16 flex flex-col items-start justify-between gap-3 border-t border-neutral-200 pt-8 md:flex-row md:items-center dark:border-neutral-900">
+          <p className="mono text-xs text-neutral-500 dark:text-neutral-500">
+            &copy; {year} AIRFLOW &middot; ALL RIGHTS RESERVED
+          </p>
+          <p className="mono text-xs text-neutral-500 dark:text-neutral-500">
+            STATUS: ALL SYSTEMS OPERATIONAL
+            <span className="ml-2 inline-block h-1.5 w-1.5 translate-y-[-1px] rounded-full bg-emerald-500" />
+          </p>
         </div>
       </div>
     </footer>
