@@ -6,6 +6,7 @@ import { Menu as MenuIcon, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
+import UserNav from "@/components/navigation/user-nav";
 
 const navLinks = [
   { label: "Flights", href: "/flights" },
@@ -103,19 +104,7 @@ export default function NavbarMenu() {
           <div className="hidden items-center gap-3 md:flex">
             <ThemeToggle />
             <div className="mx-1 h-6 w-px bg-neutral-200 dark:bg-neutral-800" />
-            <Link
-              href="/login"
-              className="text-[13px] font-semibold text-neutral-600 transition-colors hover:text-neutral-950 dark:text-neutral-400 dark:hover:text-white"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/sign-up"
-              className="inline-flex items-center gap-2 rounded-md bg-neutral-950 px-4 py-2 text-[13px] font-bold text-white transition-colors hover:bg-orange-500 dark:bg-white dark:text-neutral-950 dark:hover:bg-orange-500 dark:hover:text-white"
-            >
-              Get Started
-              <span className="h-1.5 w-1.5 rounded-full bg-orange-500 transition-colors group-hover:bg-white" />
-            </Link>
+            <UserNav />
           </div>
 
           <div className="flex items-center gap-2 md:hidden">

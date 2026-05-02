@@ -10,6 +10,7 @@ const FALLBACK: StatsResponse = {
   activeGates: 38,
   boardingNow: 5,
   serverTime: new Date().toISOString(),
+  source: { flightsTracked: "simulated", metrics: "simulated", board: "simulated" },
   liveBoard: [
     { code: "AF1001", route: "JFK → LAX", time: "07:10", gate: "A12", status: "BOARDING" },
     { code: "AF2204", route: "JFK → SFO", time: "09:35", gate: "B4", status: "ON TIME" },

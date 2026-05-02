@@ -1,25 +1,14 @@
-import Link from "next/link";
-import AuthShell, { AuthField } from "@/components/auth/auth-shell";
+import AuthShell from "@/components/auth/auth-shell";
 
 export default function LoginPage() {
   return (
     <AuthShell
+      mode="login"
       title="Welcome back"
-      subtitle="Sign in to continue managing bookings, checking schedules, and tracking your upcoming flights."
+      subtitle="Sign in to manage bookings, check schedules, and track your upcoming flights."
       footerText="Don't have an account?"
       footerLinkLabel="Sign up"
       footerLinkHref="/sign-up"
-    >
-      <AuthField label="Email" type="email" name="email" placeholder="name@company.com" />
-      <AuthField label="Password" type="password" name="password" placeholder="Enter your password" />
-      <div className="flex items-center justify-end">
-        <Link
-          href="/forgot-password"
-          className="text-sm font-bold text-neutral-700 transition hover:text-orange-500 dark:text-neutral-300"
-        >
-          Forgot password?
-        </Link>
-      </div>
-    </AuthShell>
+    />
   );
 }

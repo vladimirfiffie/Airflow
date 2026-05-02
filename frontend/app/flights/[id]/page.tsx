@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Plane } from "lucide-react";
-import { flightOffers } from "@/lib/mock/flights";
+import { getFlight } from "@/lib/data/flights";
 
+// Static fallbacks when DB doesn't have these fields populated; harmless when
+// real values are present.
 const gateByFlight: Record<string, string> = {
   AF1001: "A12",
   AF2204: "B4",
@@ -23,7 +25,7 @@ export default async function FlightDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const flight = flightOffers.find((item) => item.id === id);
+  const flight = await getFlight(id);
 
   if (!flight) {
     notFound();
