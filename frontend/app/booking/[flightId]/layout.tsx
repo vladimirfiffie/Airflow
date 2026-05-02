@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { flightOffers } from "@/lib/mock/flights";
+import { getFlight } from "@/lib/data/flights";
 import BookingStepper from "@/components/booking/stepper";
 import TripSummary from "@/components/booking/trip-summary";
 
@@ -11,7 +11,7 @@ export default async function BookingFlowLayout({
   params: Promise<{ flightId: string }>;
 }) {
   const { flightId } = await params;
-  const flight = flightOffers.find((f) => f.id === flightId);
+  const flight = await getFlight(flightId);
   if (!flight) notFound();
 
   return (

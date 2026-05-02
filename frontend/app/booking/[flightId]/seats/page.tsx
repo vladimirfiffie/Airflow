@@ -17,7 +17,22 @@ export default function SeatsPage({
   const { flightId } = use(params);
   const router = useRouter();
   const { state, hydrated, setPassengers } = useBookingState(flightId);
-  const seats = useMemo(() => generateSeatMap(flightId), [flightId]);
+
+  const fallbackSeats = useMemo(() => generateSeatMap(flightId), [flightId]);
+  const [seats, setSeats] = useState<Seat[]>(fallbackSeats);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/flights/${flightId}/seats`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.seats) setSeats(data.seats);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [flightId]);
 
   const [activePassenger, setActivePassenger] = useState(0);
   const [assignments, setAssignments] = useState<Record<number, string>>({});

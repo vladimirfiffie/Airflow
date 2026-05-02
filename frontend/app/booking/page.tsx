@@ -7,15 +7,64 @@ import { CheckCircle, Phone } from "lucide-react";
 const inputStyle =
   "w-full rounded-md border border-neutral-300 bg-white px-3 py-2.5 text-sm font-medium text-neutral-900 placeholder-neutral-400 outline-none transition focus:border-orange-500 dark:border-neutral-800 dark:bg-neutral-950 dark:text-white dark:placeholder-neutral-600";
 
-export default function BookingPage() {
-  const [submitted, setSubmitted] = useState(false);
-  const [bookingRef, setBookingRef] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+type LookupResult = {
+  ref: string;
+  flight: { id: string; fromCode: string; toCode: string; departTime: string; arriveTime: string; flightNo: string };
+  passengers: { firstName: string; lastName: string; seatId: string }[];
+  totalUsd: number;
+};
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+export default function BookingLookupPage() {
+  const [bookingRef, setBookingRef] = useState("");
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<LookupResult | null>(null);
+
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
+    setError(null);
+    setResult(null);
+    if (!bookingRef.trim() || !email.trim()) {
+      setError("Booking reference and email are required.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await fetch(
+        `/api/bookings/${encodeURIComponent(bookingRef.trim().toUpperCase())}?email=${encodeURIComponent(email.trim())}`,
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Booking not found.");
+        return;
+      }
+      setResult({
+        ref: data.booking.ref,
+        flight: {
+          id: data.flight.id,
+          fromCode: data.flight.fromCode,
+          toCode: data.flight.toCode,
+          departTime: data.flight.departTime,
+          arriveTime: data.flight.arriveTime,
+          flightNo: data.flight.flightNo,
+        },
+        passengers: (data.passengers as Array<{
+          first_name: string;
+          last_name: string;
+          seat_id: string;
+        }>).map((p) => ({
+          firstName: p.first_name,
+          lastName: p.last_name,
+          seatId: p.seat_id,
+        })),
+        totalUsd: Math.round(data.booking.total_cents / 100),
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Network error");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -49,21 +98,14 @@ export default function BookingPage() {
                 <input
                   value={bookingRef}
                   onChange={(e) => setBookingRef(e.target.value.toUpperCase())}
-                  placeholder="AF92KL"
+                  placeholder="AB12CD"
                   className={`${inputStyle} mono uppercase tracking-widest`}
                 />
               </label>
               <label className="block space-y-2 text-sm">
-                <span className="font-bold text-neutral-700 dark:text-neutral-300">Last name</span>
-                <input
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Passenger surname"
-                  className={inputStyle}
-                />
-              </label>
-              <label className="block space-y-2 text-sm">
-                <span className="font-bold text-neutral-700 dark:text-neutral-300">Email</span>
+                <span className="font-bold text-neutral-700 dark:text-neutral-300">
+                  Email used at booking
+                </span>
                 <input
                   type="email"
                   value={email}
@@ -74,20 +116,55 @@ export default function BookingPage() {
               </label>
               <button
                 type="submit"
-                className="w-full rounded-md bg-orange-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
+                disabled={submitting}
+                className="w-full rounded-md bg-orange-500 px-4 py-3 text-sm font-bold text-white transition hover:bg-orange-600 disabled:cursor-wait disabled:opacity-70"
               >
-                Retrieve booking
+                {submitting ? "Looking up…" : "Retrieve booking"}
               </button>
             </form>
 
-            {submitted && (
-              <div className="mt-5 flex items-start gap-3 rounded-md border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900/50 dark:bg-emerald-950/30">
-                <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                <p className="text-sm text-emerald-800 dark:text-emerald-300">
-                  Booking request received for{" "}
-                  <span className="mono font-bold">{bookingRef || "your reference"}</span>. Connect
-                  to backend APIs for live itinerary data.
-                </p>
+            {error && (
+              <p className="mt-5 rounded-md border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-800 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+                {error}
+              </p>
+            )}
+
+            {result && (
+              <div className="mt-6 rounded-lg border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-900/50 dark:bg-emerald-950/30">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <div className="flex-1">
+                    <p className="mono text-xs uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+                      Booking · {result.ref}
+                    </p>
+                    <p className="display mono mt-3 text-3xl font-black text-neutral-950 dark:text-white">
+                      {result.flight.fromCode}
+                      <span className="mx-3 text-orange-500">→</span>
+                      {result.flight.toCode}
+                    </p>
+                    <p className="mt-2 mono text-sm text-neutral-700 dark:text-neutral-300">
+                      {result.flight.flightNo} · {result.flight.departTime} →{" "}
+                      {result.flight.arriveTime}
+                    </p>
+                    <ul className="mt-4 space-y-1 text-sm">
+                      {result.passengers.map((p, i) => (
+                        <li
+                          key={i}
+                          className="flex items-center justify-between text-neutral-700 dark:text-neutral-300"
+                        >
+                          <span>
+                            {p.firstName} {p.lastName}
+                          </span>
+                          <span className="mono font-bold text-orange-500">{p.seatId}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-4 border-t border-emerald-200 pt-3 text-sm dark:border-emerald-900/50">
+                      <span className="text-neutral-700 dark:text-neutral-300">Total paid: </span>
+                      <span className="mono font-black text-orange-500">${result.totalUsd}</span>
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>

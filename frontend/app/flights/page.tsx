@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { ArrowRight, CalendarDays } from "lucide-react";
-import { flightOffers } from "@/lib/mock/flights";
+import { listFlights } from "@/lib/data/flights";
 
-export default function FlightsPage() {
+export default async function FlightsPage() {
+  const flightOffers = await listFlights();
   return (
     <div>
       {/* Page header */}

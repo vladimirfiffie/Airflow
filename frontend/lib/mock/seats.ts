@@ -29,8 +29,9 @@ function isTaken(flightId: string, seatId: string): boolean {
   return hash % 7 < 2;
 }
 
-export function generateSeatMap(flightId: string): Seat[] {
-  const seats: Seat[] = [];
+/** Pure cabin layout — every seat available. */
+export function generateSeatLayout(): Omit<Seat, "taken">[] {
+  const seats: Omit<Seat, "taken">[] = [];
   for (let row = 1; row <= TOTAL_ROWS; row++) {
     const cls = classOf(row);
     const cols = cls === "first" ? FIRST_COLS : ECON_COLS;
@@ -41,12 +42,19 @@ export function generateSeatMap(flightId: string): Seat[] {
         row,
         col,
         cls,
-        taken: isTaken(flightId, id),
         surcharge: surchargeOf(cls),
       });
     }
   }
   return seats;
+}
+
+/** Layout with the synthetic mock "taken" pattern overlaid. */
+export function generateSeatMap(flightId: string): Seat[] {
+  return generateSeatLayout().map((seat) => ({
+    ...seat,
+    taken: isTaken(flightId, seat.id),
+  }));
 }
 
 export const TOTAL_ROWS_COUNT = TOTAL_ROWS;

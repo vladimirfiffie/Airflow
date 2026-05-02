@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { ArrowRight, Globe, Shield, Zap, Clock, Plane, Search } from "lucide-react";
-import { flightOffers } from "@/lib/mock/flights";
+import { listFlights } from "@/lib/data/flights";
 import AppleCardsCarouselDemo from "@/components/apple-cards-carousel-demo";
 import LiveTicker from "@/components/live/live-ticker";
 import LiveStats from "@/components/live/live-stats";
 import LiveBadge from "@/components/live/live-badge";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const flightOffers = await listFlights();
   return (
     <div>
       {/* HERO */}
