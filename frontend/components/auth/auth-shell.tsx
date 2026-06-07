@@ -10,6 +10,10 @@ import { getBrowserClient, isSupabaseConfiguredOnClient } from "@/lib/supabase/b
 
 type Mode = "login" | "signup" | "forgot";
 
+function formatName(value: string) {
+  return value.replace(/[^a-zA-Z\s'-]/g, "").slice(0, 80);
+}
+
 type AuthShellProps = {
   mode: Mode;
   title: string;
@@ -169,7 +173,7 @@ export default function AuthShell(props: AuthShellProps) {
                 type="text"
                 name="name"
                 value={name}
-                onChange={setName}
+                onChange={(v) => setName(formatName(v))}
                 placeholder="Jane Doe"
                 autoComplete="name"
               />

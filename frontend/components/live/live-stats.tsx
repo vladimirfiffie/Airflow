@@ -1,10 +1,16 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useLiveStats } from "./use-live-stats";
 import LiveCounter from "./live-counter";
 
 export default function LiveStats() {
   const { stats } = useLiveStats(5000);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <section className="border-b border-neutral-200 dark:border-neutral-900">
@@ -14,8 +20,8 @@ export default function LiveStats() {
             <span className="inline-block h-1.5 w-1.5 translate-y-[-1px] animate-pulse rounded-full bg-orange-500" />{" "}
             LIVE OPERATIONS · UPDATED EVERY 5s
           </p>
-          <p className="mono text-xs text-neutral-500 dark:text-neutral-400">
-            {new Date(stats.serverTime).toLocaleTimeString([], { hour12: false })}
+          <p className="mono text-xs text-neutral-500 dark:text-neutral-400" suppressHydrationWarning>
+            {mounted ? new Date(stats.serverTime).toLocaleTimeString([], { hour12: false }) : ""}
           </p>
         </div>
 

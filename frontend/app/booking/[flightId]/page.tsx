@@ -12,6 +12,21 @@ const inputStyle =
 const labelStyle = "block space-y-2 text-sm";
 const labelText = "font-bold text-neutral-700 dark:text-neutral-300";
 
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length === 0) return "";
+  if (digits.length === 11 && digits.startsWith("1")) {
+    return `+1 (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
+  }
+  if (digits.length <= 3) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+}
+
+function formatName(value: string) {
+  return value.replace(/[^a-zA-Z\s'-]/g, "").slice(0, 50);
+}
+
 export default function PassengersPage({
   params,
 }: {
@@ -27,6 +42,11 @@ export default function PassengersPage({
   ]);
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
+  const [maxDob, setMaxDob] = useState("");
+
+  useEffect(() => {
+    setMaxDob(new Date().toISOString().split("T")[0]);
+  }, []);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -61,6 +81,8 @@ export default function PassengersPage({
     });
     if (!contactEmail.trim()) next.push("Contact email required.");
     if (!contactPhone.trim()) next.push("Contact phone required.");
+    else if (contactPhone.replace(/\D/g, "").length < 10)
+      next.push("Contact phone must be at least 10 digits.");
 
     if (next.length) {
       setErrors(next);
@@ -119,8 +141,9 @@ export default function PassengersPage({
                 <input
                   className={inputStyle}
                   value={p.firstName}
-                  onChange={(e) => updatePassenger(i, { firstName: e.target.value })}
+                  onChange={(e) => updatePassenger(i, { firstName: formatName(e.target.value) })}
                   placeholder="Jane"
+                  autoComplete="given-name"
                 />
               </label>
               <label className={labelStyle}>
@@ -128,8 +151,9 @@ export default function PassengersPage({
                 <input
                   className={inputStyle}
                   value={p.lastName}
-                  onChange={(e) => updatePassenger(i, { lastName: e.target.value })}
+                  onChange={(e) => updatePassenger(i, { lastName: formatName(e.target.value) })}
                   placeholder="Doe"
+                  autoComplete="family-name"
                 />
               </label>
               <label className={labelStyle}>
@@ -138,7 +162,9 @@ export default function PassengersPage({
                   type="date"
                   className={inputStyle}
                   value={p.dob}
+                  max={maxDob || undefined}
                   onChange={(e) => updatePassenger(i, { dob: e.target.value })}
+                  autoComplete="bday"
                 />
               </label>
             </div>
@@ -172,6 +198,8 @@ export default function PassengersPage({
               value={contactEmail}
               onChange={(e) => setContactEmail(e.target.value)}
               placeholder="you@example.com"
+              autoComplete="email"
+              inputMode="email"
             />
           </label>
           <label className={labelStyle}>
@@ -180,8 +208,11 @@ export default function PassengersPage({
               type="tel"
               className={inputStyle}
               value={contactPhone}
-              onChange={(e) => setContactPhone(e.target.value)}
-              placeholder="+1 555 000 0000"
+              onChange={(e) => setContactPhone(formatPhone(e.target.value))}
+              placeholder="(555) 000-0000"
+              autoComplete="tel"
+              inputMode="tel"
+              maxLength={20}
             />
           </label>
         </div>

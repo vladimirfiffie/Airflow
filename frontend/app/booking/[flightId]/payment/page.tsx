@@ -29,6 +29,27 @@ function formatExpiry(value: string) {
   return `${digits.slice(0, 2)}/${digits.slice(2)}`;
 }
 
+function formatName(value: string) {
+  return value.replace(/[^a-zA-Z\s'-]/g, "").slice(0, 50);
+}
+
+function formatPostal(value: string) {
+  return value.replace(/[^a-zA-Z0-9\s-]/g, "").toUpperCase().slice(0, 10);
+}
+
+function validateExpiry(value: string): string | null {
+  if (!/^\d{2}\/\d{2}$/.test(value)) return "Expiry must be MM/YY.";
+  const [mm, yy] = value.split("/").map(Number);
+  if (mm < 1 || mm > 12) return "Expiry month must be 01–12.";
+  const now = new Date();
+  const currentYear = now.getFullYear() % 100;
+  const currentMonth = now.getMonth() + 1;
+  if (yy < currentYear || (yy === currentYear && mm < currentMonth)) {
+    return "Card has expired.";
+  }
+  return null;
+}
+
 const stripeConfigured = Boolean(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 type FlightLite = { priceUsd: number };
@@ -132,7 +153,8 @@ export default function PaymentPage({
     const next: string[] = [];
     if (cardNumber.replace(/\s/g, "").length < 15) next.push("Card number looks too short.");
     if (!cardName.trim()) next.push("Cardholder name required.");
-    if (!/^\d{2}\/\d{2}$/.test(expiry)) next.push("Expiry must be MM/YY.");
+    const expiryError = validateExpiry(expiry);
+    if (expiryError) next.push(expiryError);
     if (cvv.length < 3) next.push("CVV must be 3 or 4 digits.");
     if (!postalCode.trim()) next.push("Postal code required.");
     if (next.length) {
@@ -202,7 +224,7 @@ export default function PaymentPage({
                 <input
                   className={inputStyle}
                   value={cardName}
-                  onChange={(e) => setCardName(e.target.value.toUpperCase())}
+                  onChange={(e) => setCardName(formatName(e.target.value).toUpperCase())}
                   placeholder="JANE DOE"
                   autoComplete="cc-name"
                 />
@@ -235,7 +257,7 @@ export default function PaymentPage({
                   <input
                     className={`${inputStyle} mono`}
                     value={postalCode}
-                    onChange={(e) => setPostalCode(e.target.value.toUpperCase())}
+                    onChange={(e) => setPostalCode(formatPostal(e.target.value))}
                     placeholder="10001"
                     autoComplete="postal-code"
                   />
