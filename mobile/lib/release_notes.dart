@@ -27,8 +27,9 @@ class ReleaseNote {
 /// Newest first.
 const List<ReleaseNote> releaseNotes = [
   ReleaseNote(
-    version: '1.0.0',
-    headline: 'The Airflow Android app: adaptive UI and native integrations.',
+    version: '1.0.0-beta.1',
+    headline: 'First beta of the Airflow Android app — adaptive UI and '
+        'native integrations.',
     changes: [
       'Five-tab navigation with per-tab history, so switching tabs never loses your place. Adapts to a side rail on tablets and unfolded foldables.',
       'Bookings are saved on the device and survive a restart, with an optional fingerprint or face unlock in front of them.',
@@ -38,6 +39,7 @@ const List<ReleaseNote> releaseNotes = [
       'Haptic feedback throughout — distinct responses for claiming a seat, hitting a sold-out one, crossing a booking step, and confirming payment.',
       'Payment is now a deliberate slide-to-confirm rather than a tap.',
       'Platform-correct dialogs, pickers, sheets, transitions and scroll physics throughout.',
+      'Beta scope: Android only, and flight data is still the built-in sample set — nothing talks to a server yet.',
     ],
   ),
 ];
