@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Airflow accent — the same orange as the web app's --accent token. -->
+    <color name="ic_launcher_background">#F97316</color>
+    <!-- Splash surfaces, light and dark, matching AppColors.background. -->
+    <color name="splash_background">#FFFFFF</color>
+    <color name="splash_background_dark">#0A0A0A</color>
+</resources>

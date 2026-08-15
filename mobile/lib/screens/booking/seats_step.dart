@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../platform/adaptive.dart';
+import '../../platform/haptics.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/brutal.dart';
 import '../../state/booking_controller.dart';
@@ -25,13 +27,20 @@ class _SeatsStepState extends State<SeatsStep> {
   int _active = 0;
 
   void _tapSeat(Seat seat) {
-    if (seat.taken) return;
+    if (seat.taken) {
+      // Tapping a sold seat is the most common miss on this screen — a buzz
+      // explains the non-response faster than any label could.
+      AppHaptics.warning();
+      return;
+    }
     final ctrl = widget.controller;
     setState(() {
       if (ctrl.passengers[_active].seatId == seat.id) {
         ctrl.assignSeat(_active, null);
+        AppHaptics.selection();
       } else {
         ctrl.assignSeat(_active, seat.id);
+        AppHaptics.rigid();
         // advance to next unseated passenger
         final next = ctrl.passengers
             .indexWhere((p) => p.seatId == null);
@@ -42,10 +51,14 @@ class _SeatsStepState extends State<SeatsStep> {
 
   void _continue() {
     if (!widget.controller.allSeatsAssigned) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Pick a seat for every passenger.')));
+      Adaptive.notify(
+        context,
+        'Pick a seat for every passenger.',
+        isError: true,
+      );
       return;
     }
+    AppHaptics.step();
     widget.onNext();
   }
 

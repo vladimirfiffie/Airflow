@@ -36,7 +36,6 @@ class ScheduleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColors.of(context);
     return AppScaffold(
-      currentRoute: '/schedule',
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

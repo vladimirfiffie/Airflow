@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../platform/adaptive.dart';
+import '../../platform/haptics.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/brutal.dart';
 import '../../state/booking_controller.dart';
@@ -31,13 +33,15 @@ class _PassengersStepState extends State<PassengersStep> {
 
   Future<void> _pickDob(int i) async {
     final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
+    final picked = await Adaptive.pickDate(
+      context,
       initialDate: DateTime(now.year - 30),
       firstDate: DateTime(1920),
       lastDate: now,
+      helpText: 'Date of birth',
     );
     if (picked != null) {
+      AppHaptics.selection();
       setState(() {
         widget.controller.passengers[i].dob =
             '${picked.year.toString().padLeft(4, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
@@ -46,15 +50,22 @@ class _PassengersStepState extends State<PassengersStep> {
   }
 
   void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      AppHaptics.warning();
+      return;
+    }
     final missingDob = widget.controller.passengers.any((p) => p.dob.isEmpty);
     if (missingDob) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Date of birth required for every passenger.')));
+      Adaptive.notify(
+        context,
+        'Date of birth required for every passenger.',
+        isError: true,
+      );
       return;
     }
     widget.controller.contact.email = _email.text.trim();
     widget.controller.contact.phone = _phone.text.trim();
+    AppHaptics.step();
     widget.onNext();
   }
 

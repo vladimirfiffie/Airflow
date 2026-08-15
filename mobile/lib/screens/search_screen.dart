@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../platform/haptics.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_scaffold.dart';
+import '../widgets/app_shell.dart';
 import '../widgets/brutal.dart';
 import '../data/mock_flights.dart';
 import '../models/flight.dart';
@@ -13,10 +15,31 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final _queryController = TextEditingController();
   String _query = '';
   int _maxStops = 2; // 0 nonstop, 1 ≤1 stop, 2 any
   double _maxPrice = 250;
   String _sort = 'price'; // price | duration
+
+  @override
+  void dispose() {
+    _queryController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // A deep link can arrive while this tab is already built, so the query is
+    // consumed here rather than in initState.
+    final shell = AppShellScope.maybeOf(context);
+    final pending = shell?.pendingSearchQuery;
+    if (pending != null) {
+      shell!.pendingSearchQuery = null;
+      _queryController.text = pending;
+      _query = pending;
+    }
+  }
 
   List<FlightOffer> get _results {
     final q = _query.trim().toUpperCase();
@@ -43,7 +66,6 @@ class _SearchScreenState extends State<SearchScreen> {
     final c = AppColors.of(context);
     final results = _results;
     return AppScaffold(
-      currentRoute: '/search',
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -60,6 +82,8 @@ class _SearchScreenState extends State<SearchScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
+                    controller: _queryController,
+                    textInputAction: TextInputAction.search,
                     onChanged: (v) => setState(() => _query = v),
                     decoration: InputDecoration(
                       isDense: true,
@@ -81,14 +105,17 @@ class _SearchScreenState extends State<SearchScreen> {
                 const SizedBox(height: 14),
                 Text('Max price: \$${_maxPrice.round()}',
                     style: const TextStyle(fontWeight: FontWeight.w700)),
-                Slider(
+                Slider.adaptive(
                   value: _maxPrice,
                   min: 100,
                   max: 250,
                   divisions: 15,
                   activeColor: c.accent,
                   label: '\$${_maxPrice.round()}',
-                  onChanged: (v) => setState(() => _maxPrice = v),
+                  onChanged: (v) {
+                    if (v.round() != _maxPrice.round()) AppHaptics.selection();
+                    setState(() => _maxPrice = v);
+                  },
                 ),
                 const SizedBox(height: 8),
                 Text('Stops', style: const TextStyle(fontWeight: FontWeight.w700)),

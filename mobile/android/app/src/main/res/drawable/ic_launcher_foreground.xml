@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive-icon foreground: the Airflow paper plane.
+     Drawn as a vector so it stays sharp at every launcher density and needs
+     no bitmap assets. The 108dp viewport is the adaptive-icon standard; the
+     glyph is kept inside the centre 72dp so no launcher mask clips it. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,26 L84,78 L54,65 L24,78 Z" />
+</vector>

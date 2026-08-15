@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../platform/haptics.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/app_scaffold.dart';
 import '../../models/flight.dart';
@@ -31,6 +32,9 @@ class _BookingFlowState extends State<BookingFlow> {
   }
 
   void _to(int step) {
+    // A step boundary is the one place in this flow where a medium impact
+    // reads as progress rather than noise.
+    if (step != _step) AppHaptics.step();
     setState(() => _step = step);
   }
 

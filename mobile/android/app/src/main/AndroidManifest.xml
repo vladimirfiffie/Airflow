@@ -1,6 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Lets the plugin re-register scheduled boarding reminders after a
+         reboot; without it, a reminder set today silently vanishes if the
+         phone restarts before the flight. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- VIBRATE and POST_NOTIFICATIONS are contributed by the haptic_kit and
+         flutter_local_notifications plugin manifests and merge in here. -->
+
     <application
-        android:label="airflow"
+        android:label="Airflow"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -24,7 +31,51 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!-- Custom scheme: airflow://flight/AF1001, airflow://booking/AB12CD,
+                 airflow://search?q=JFK. Always resolves to this app. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="airflow"/>
+            </intent-filter>
+
+            <!-- Verified App Links for the same paths the web app serves.
+                 android:autoVerify makes Android check
+                 https://airflow.app/.well-known/assetlinks.json at install
+                 time; until that file is published with this app's signing
+                 certificate fingerprint, these links open in the browser
+                 instead — the custom scheme above is unaffected. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="https"
+                      android:host="airflow.app"
+                      android:pathPrefix="/flights"/>
+                <data android:scheme="https"
+                      android:host="airflow.app"
+                      android:pathPrefix="/booking"/>
+            </intent-filter>
         </activity>
+
+        <!-- Delivers scheduled reminders, and re-arms them across reboots and
+             app updates. -->
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"/>
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
@@ -40,6 +91,13 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Package visibility for "Add to calendar". Without this, Android 11+
+             reports no handler for the insert intent even when a calendar app
+             is installed, and the action silently fails. -->
+        <intent>
+            <action android:name="android.intent.action.INSERT"/>
+            <data android:mimeType="vnd.android.cursor.dir/event"/>
         </intent>
     </queries>
 </manifest>

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../platform/adaptive.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_scaffold.dart';
+import '../widgets/app_shell.dart';
 import '../widgets/brutal.dart';
 import '../widgets/live_stats.dart';
 import '../data/mock_flights.dart';
@@ -13,7 +15,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      currentRoute: '/',
       padded: false,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -152,7 +153,7 @@ class _SearchBar extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
-              onSubmitted: (_) => Navigator.pushNamed(context, '/search'),
+              onSubmitted: (_) => AppShellScope.of(context).goToTab(AppTab.search),
               decoration: InputDecoration(
                 isDense: true,
                 border: InputBorder.none,
@@ -168,7 +169,7 @@ class _SearchBar extends StatelessWidget {
           PrimaryButton(
             label: 'Search',
             icon: Icons.arrow_forward,
-            onPressed: () => Navigator.pushNamed(context, '/search'),
+            onPressed: () => AppShellScope.of(context).goToTab(AppTab.search),
           ),
         ],
       ),
@@ -183,7 +184,7 @@ class _RouteChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColors.of(context);
     return InkWell(
-      onTap: () => Navigator.pushNamed(context, '/search'),
+      onTap: () => AppShellScope.of(context).goToTab(AppTab.search),
       borderRadius: BorderRadius.circular(6),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -298,7 +299,7 @@ class _DestinationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => Navigator.pushNamed(context, '/search'),
+      onTap: () => AppShellScope.of(context).goToTab(AppTab.search),
       borderRadius: BorderRadius.circular(20),
       child: Container(
         width: 230,
@@ -410,7 +411,7 @@ class _CtaSection extends StatelessWidget {
             PrimaryButton(
               label: 'Search Flights',
               icon: Icons.arrow_forward,
-              onPressed: () => Navigator.pushNamed(context, '/search'),
+              onPressed: () => AppShellScope.of(context).goToTab(AppTab.search),
             ),
           ],
         ),
@@ -452,10 +453,10 @@ class FlightCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColors.of(context);
     return BrutalCard(
-      onTap: () => Navigator.push(
+      onTap: () => Adaptive.push(
         context,
-        MaterialPageRoute(
-            builder: (_) => FlightDetailsScreen(flightId: flight.id)),
+        builder: (_) => FlightDetailsScreen(flightId: flight.id),
+        title: flight.flightNo,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

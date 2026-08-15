@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../platform/adaptive.dart';
+import '../platform/haptics.dart';
+import '../services/share_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_scaffold.dart';
 import '../widgets/brutal.dart';
@@ -19,6 +22,14 @@ class FlightDetailsScreen extends StatelessWidget {
       );
     }
     return AppScaffold(
+      title: flight.flightNo,
+      actions: [
+        IconButton(
+          tooltip: 'Share flight',
+          icon: const Icon(Icons.ios_share, size: 20),
+          onPressed: () => ShareService.flight(flight),
+        ),
+      ],
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -90,11 +101,14 @@ class FlightDetailsScreen extends StatelessWidget {
               label: 'Book this flight',
               icon: Icons.arrow_forward,
               expand: true,
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => BookingFlow(flight: flight)),
-              ),
+              onPressed: () {
+                AppHaptics.step();
+                Adaptive.push(
+                  context,
+                  builder: (_) => BookingFlow(flight: flight),
+                  title: 'Book ${flight.flightNo}',
+                );
+              },
             ),
           ),
           const SizedBox(height: 12),

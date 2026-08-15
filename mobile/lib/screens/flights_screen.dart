@@ -9,7 +9,6 @@ class FlightsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      currentRoute: '/flights',
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

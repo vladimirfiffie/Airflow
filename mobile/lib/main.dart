@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
+
+import 'services/bookings_repository.dart';
+import 'services/notifications_service.dart';
 import 'theme/app_theme.dart';
-import 'screens/home_screen.dart';
-import 'screens/search_screen.dart';
-import 'screens/flights_screen.dart';
-import 'screens/schedule_screen.dart';
-import 'screens/help_screen.dart';
+import 'widgets/app_shell.dart';
 
 /// Global theme mode, toggled from the app bar.
 final ValueNotifier<ThemeMode> themeMode =
     ValueNotifier<ThemeMode>(ThemeMode.system);
 
-void main() => runApp(const AirflowApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Both are needed before the first frame can be truthful: the notification
+  // plugin has to be initialised to report what launched the app, and the
+  // Bookings tab should render its real contents rather than flashing an
+  // empty state first.
+  await Future.wait([
+    NotificationsService.instance.init(),
+    BookingsRepository.instance.load(),
+  ]);
+
+  runApp(const AirflowApp());
+}
 
 class AirflowApp extends StatelessWidget {
   const AirflowApp({super.key});
@@ -26,14 +38,7 @@ class AirflowApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: mode,
-          initialRoute: '/',
-          routes: {
-            '/': (_) => const HomeScreen(),
-            '/search': (_) => const SearchScreen(),
-            '/flights': (_) => const FlightsScreen(),
-            '/schedule': (_) => const ScheduleScreen(),
-            '/help': (_) => const HelpScreen(),
-          },
+          home: const AppShell(),
         );
       },
     );

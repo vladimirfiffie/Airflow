@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:haptic_kit/haptic_kit.dart' show SlideToConfirm, SlideToConfirmState;
+import '../../platform/adaptive.dart';
+import '../../platform/haptics.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/brutal.dart';
 import '../../state/booking_controller.dart';
@@ -28,6 +31,7 @@ class _PaymentStepState extends State<PaymentStep> {
   final _expiry = TextEditingController();
   final _cvv = TextEditingController();
   final _postal = TextEditingController();
+  final _slideKey = GlobalKey<SlideToConfirmState>();
   bool _processing = false;
 
   @override
@@ -52,7 +56,16 @@ class _PaymentStepState extends State<PaymentStep> {
   }
 
   Future<void> _pay() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      // The slide latches at 100%; send it home so the user can correct the
+      // form and try again.
+      _slideKey.currentState?.reset();
+      AppHaptics.error();
+      if (mounted) {
+        Adaptive.notify(context, 'Check your card details', isError: true);
+      }
+      return;
+    }
     setState(() => _processing = true);
     final p = widget.controller.payment;
     p.cardNumber = _number.text;
@@ -63,6 +76,7 @@ class _PaymentStepState extends State<PaymentStep> {
     await Future.delayed(const Duration(milliseconds: 800));
     widget.controller.bookingRef = generateBookingRef();
     if (!mounted) return;
+    AppHaptics.success();
     widget.onNext();
   }
 
@@ -174,20 +188,52 @@ class _PaymentStepState extends State<PaymentStep> {
             ),
           ),
           const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              GhostButton(
-                  label: 'Back',
-                  icon: Icons.arrow_back,
-                  onPressed: _processing ? null : widget.onBack),
-              PrimaryButton(
-                label: 'Pay \$${fare.total} & confirm',
-                icon: Icons.lock,
-                loading: _processing,
-                onPressed: _pay,
+          // A deliberate drag rather than a tap: this is the irreversible step
+          // in the flow, and the detent ticks on the way across make the
+          // commitment feel physical. Swapped for a progress row while the
+          // charge is in flight so it can't be triggered twice.
+          if (_processing)
+            Container(
+              height: 64,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: c.surface,
+                borderRadius: BorderRadius.circular(32),
+                border: Border.all(color: c.border),
               ),
-            ],
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Adaptive.progressIndicator(size: 18, color: c.accent),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Processing…',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      color: c.foreground,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            SlideToConfirm(
+              key: _slideKey,
+              label: 'Slide to pay \$${fare.total}',
+              handleIcon: Icons.lock_outline,
+              trackColor: c.surface2,
+              handleColor: c.accent,
+              textColor: c.muted,
+              onConfirmed: _pay,
+            ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: GhostButton(
+              label: 'Back',
+              icon: Icons.arrow_back,
+              onPressed: _processing ? null : widget.onBack,
+            ),
           ),
         ],
       ),
