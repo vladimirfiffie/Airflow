@@ -1,0 +1,193 @@
+name: Release
+
+# Three ways to cut a release, all ending in the same place:
+#
+#   1. Bump `version:` in mobile/pubspec.yaml and push to main. If no release
+#      exists for that version yet, one is published. This is the usual route —
+#      it needs no tag push, so it works without git credentials.
+#   2. Push a tag: git tag v1.0.0 && git push origin v1.0.0
+#   3. Run this workflow manually from the Actions tab and fill in "tag".
+#
+# A hyphen in the version marks it a prerelease: v1.0.0-beta.1 yes, v1.0.0 no.
+#
+# The Flutter app lives in mobile/, so every Flutter/Dart step runs from there
+# while action inputs and artifact paths stay workspace-relative.
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version label for a manual build (e.g. v1.0.0-beta.1)'
+        required: true
+        default: 'v0.0.0-manual'
+
+permissions:
+  contents: write
+
+jobs:
+  # Cheap gate, ~10 seconds. Decides the tag and whether there is anything to
+  # publish, so an ordinary push to main that did not touch the version does
+  # not pay for a six-minute Gradle build.
+  decide:
+    name: Decide
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+      prerelease: ${{ steps.resolve.outputs.prerelease }}
+      publish: ${{ steps.resolve.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version and decide
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+
+          # An explicit tag or manual run always publishes. A branch push only
+          # publishes when pubspec names a version that has no release yet.
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            TAG="$INPUT_TAG"
+            EXPLICIT=true
+          elif [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            TAG="$GITHUB_REF_NAME"
+            EXPLICIT=true
+          else
+            VERSION=$(grep -m1 '^version:' mobile/pubspec.yaml \
+                      | cut -d':' -f2 | tr -d '[:space:]' | cut -d'+' -f1)
+            if [ -z "$VERSION" ]; then
+              echo "::error::could not read version: from mobile/pubspec.yaml"
+              exit 1
+            fi
+            TAG="v${VERSION}"
+            EXPLICIT=false
+          fi
+
+          # Same rule the in-app release notes use: a hyphen means prerelease.
+          # Flagging every release as prerelease would leave /releases/latest
+          # returning 404 and the releases page a bare list of tags.
+          case "$TAG" in
+            *-*) PRE=true  ;;
+            *)   PRE=false ;;
+          esac
+
+          if [ "$EXPLICIT" = true ]; then
+            PUBLISH=true
+          elif gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            PUBLISH=false
+            echo "::notice::$TAG is already released. Bump version: in mobile/pubspec.yaml (and add a mobile/lib/release_notes.dart entry) to cut a new one."
+          else
+            PUBLISH=true
+          fi
+
+          {
+            echo "tag=$TAG"
+            echo "prerelease=$PRE"
+            echo "publish=$PUBLISH"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "### Release decision" >> "$GITHUB_STEP_SUMMARY"
+          echo "- tag: \`$TAG\`"          >> "$GITHUB_STEP_SUMMARY"
+          echo "- prerelease: $PRE"       >> "$GITHUB_STEP_SUMMARY"
+          echo "- publishing: $PUBLISH"   >> "$GITHUB_STEP_SUMMARY"
+
+  android:
+    name: Build & publish Android
+    runs-on: ubuntu-latest
+    needs: decide
+    if: needs.decide.outputs.publish == 'true'
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          # AGP supports only a trailing window of JDK releases, and a runner
+          # image bumping its default JDK should not break the build.
+          java-version: '21'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          # Matches the SDK the app is developed against. Bump deliberately.
+          flutter-version: 3.47.0
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --fatal-infos
+
+      - name: Test
+        run: flutter test
+
+      # Debug-signed: this is a test build, not a Play Store artifact.
+      # Installing it requires "install from unknown sources".
+      # See mobile/README.md.
+      - name: Build release APKs (split per ABI)
+        run: flutter build apk --release --split-per-abi
+
+      # Also shipped because a split APK is useless to anyone who does not
+      # know their device's ABI; the universal one always works, at roughly
+      # triple the native-code size.
+      - name: Build universal APK
+        run: flutter build apk --release
+
+      - name: Rename artifacts
+        env:
+          V: ${{ needs.decide.outputs.tag }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk \
+             "dist/airflow-${V}-universal.apk"
+          for abi in arm64-v8a armeabi-v7a x86_64; do
+            src="build/app/outputs/flutter-apk/app-${abi}-release.apk"
+            # Fail loudly rather than publishing a set that looks complete
+            # until someone needs the missing architecture.
+            test -f "$src" || { echo "::error::missing $src"; exit 1; }
+            cp "$src" "dist/airflow-${V}-${abi}.apk"
+          done
+          ls -lh dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: airflow-apks
+          path: mobile/dist/*.apk
+          if-no-files-found: error
+
+      # Generated from mobile/lib/release_notes.dart, so the published notes
+      # cannot drift from what is recorded in the repo. A version with no entry
+      # there warns and falls back to an auto-generated body rather than
+      # discarding the build.
+      - name: Generate release notes
+        run: |
+          dart run tool/generate_release_notes.dart \
+            "${{ needs.decide.outputs.tag }}" > RELEASE_NOTES.md
+          cat RELEASE_NOTES.md
+
+      # No `if:` on the ref here on purpose. Gating this on
+      # startsWith(github.ref, 'refs/tags/v') would mean a main push or manual
+      # run builds everything and then silently skips publishing, since
+      # github.ref is refs/heads/main for both. tag_name + target_commitish
+      # make those paths create the tag server-side instead.
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.decide.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: Airflow ${{ needs.decide.outputs.tag }}
+          prerelease: ${{ needs.decide.outputs.prerelease }}
+          make_latest: ${{ needs.decide.outputs.prerelease == 'false' }}
+          # Appends the auto-generated commit/PR list below our own copy.
+          generate_release_notes: true
+          files: mobile/dist/*.apk
+          body_path: mobile/RELEASE_NOTES.md
