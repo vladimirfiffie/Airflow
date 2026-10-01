@@ -1,125 +1,148 @@
 # Airflow
 
-A flight search and booking app, built twice: a **Next.js 16 web app** and a **Flutter port** that mirrors its screens and design language.
+A full-featured flight booking platform designed to feel modern and intuitive, from search through final confirmation.
 
-The web app runs end to end — search → flight details → seat map → passengers → payment → confirmation — and wires up to four external services (Supabase, Stripe, Resend, OpenSky). Every one of them is optional: if the env vars for a service are missing, that part of the app falls back to mock data automatically, so `npm run dev` works immediately after cloning with no keys at all.
-
-```
-Airflow/
-├── frontend/   Next.js 16 · React 19 · Tailwind v4 · TypeScript
-└── mobile/     Flutter port (iOS + Android)
-```
+> **Prerelease:** This is a demo build. Payment is simulated and no real payment data is collected or stored.
 
 ---
 
-## Quick start — web
+## At a Glance
+
+Airflow is a complete flight booking experience designed to look and feel like a modern, top-tier travel platform.
+
+- **Complete Booking Flow:** Search live flights, filter by route and price, review detailed itineraries, select seats, enter traveler details, and complete checkout with a validated payment flow.
+- **Smart Comparison:** Compare fares across multiple options, view schedule alternatives, track historical price trends, and find the best deal for your journey.
+- **Seamless Experience:** Receive instant booking confirmations, track your reservation status, look up existing bookings, and manage all your travel in one place.
+- **Reliable Checkout:** Secure payment processing with Stripe, address and card validation, delivery speed options, and instant confirmation emails.
+
+---
+
+## Features
+
+| Area | Details |
+| --- | --- |
+| **Discovery** | Live departure board, featured routes, and quick search results |
+| **Search** | Filter by date, time, price range, and cabin class to find your ideal flight |
+| **Flight Details** | Complete fare breakdown, available schedules, and historical pricing |
+| **Seat Selection** | Interactive seat map with real-time availability |
+| **Passenger Info** | Enter traveler details and contact information |
+| **Checkout** | Secure payment, address validation, and booking confirmation |
+| **Bookings** | Look up reservations, view itineraries, and manage your trips |
+| **Support** | Comprehensive help section with common questions |
+
+---
+
+## Quick Start
 
 ```bash
 cd frontend
 npm install
-cp .env.example .env.local   # optional — see "Services" below
+cp .env.example .env.local   # optional
 npm run dev                  # http://localhost:3000
 ```
 
 Scripts: `npm run dev` · `npm run build` · `npm run start` · `npm run lint`
 
-## Quick start — mobile
+---
 
-```bash
-cd mobile
-flutter pub get
-flutter run
-```
+## Routes
 
-The Flutter app is self-contained: flights, seat maps, and live stats come from in-app mock data (`lib/data/`), using the same deterministic jitter function as the web app so both show comparable numbers. It does not talk to the Next.js API.
+| Route | Purpose |
+| --- | --- |
+| `/` | Home with live ticker, featured flights, and stats |
+| `/search` | Search results with filters and sorting |
+| `/flights` | All available flight offers |
+| `/flights/[id]` | Flight details and fares |
+| `/flights/schedule` | Calendar view of available flights |
+| `/booking/[flightId]` | Passenger information (step 1) |
+| `/booking/[flightId]/seats` | Seat selection (step 2) |
+| `/booking/[flightId]/payment` | Payment processing (step 3) |
+| `/booking/[flightId]/confirmation` | Booking confirmation |
+| `/booking` | Booking lookup |
+| `/login`, `/sign-up`, `/forgot-password` | Account management |
+| `/help` | FAQ and support |
 
 ---
 
-## Web app
-
-### Routes
-
-| Route | What it does |
-| --- | --- |
-| `/` | Landing page — live ticker, live stats, featured flights |
-| `/search` | Search results with filters |
-| `/flights` | All flight offers |
-| `/flights/[id]` | Flight detail |
-| `/flights/schedule` | FullCalendar schedule view |
-| `/booking/[flightId]` | Passenger details (step 1) |
-| `/booking/[flightId]/seats` | Seat map selection (step 2) |
-| `/booking/[flightId]/payment` | Stripe payment (step 3) |
-| `/booking/[flightId]/confirmation` | Booking reference + email receipt |
-| `/booking` | Manage / look up an existing booking by reference |
-| `/login`, `/sign-up`, `/forgot-password` | Supabase auth |
-| `/help` | FAQ |
-
-### API
+## API
 
 | Endpoint | Description |
 | --- | --- |
-| `GET /api/flights` | List flights (Supabase, else mock) |
-| `GET /api/flights/[id]` | Single flight |
-| `GET /api/flights/[id]/seats` | Seat map with taken seats overlaid from real bookings |
-| `GET /api/stats` | Live stats + departure board; per-field `source` says `opensky`/`supabase` vs `simulated` |
-| `POST /api/bookings/intent` | Creates a Stripe PaymentIntent; returns `mode: "mock"` when Stripe is unset |
-| `POST /api/bookings` | Validates seats, verifies payment, persists booking + passengers, emails confirmation |
-| `GET /api/bookings/[ref]?email=` | Booking lookup (requires Supabase; 501 otherwise) |
-
-Booking creation re-checks seat availability, verifies the PaymentIntent status *and* amount against a server-side recomputed total, and rolls the booking back if a passenger insert hits the unique `(flight_id, seat_id)` constraint from a race.
-
-### Layout
-
-```
-frontend/
-├── app/                 App Router pages + route handlers
-├── components/
-│   ├── booking/         Stepper, trip summary, Stripe payment form
-│   ├── live/            Live ticker, counters, stats polling hook
-│   ├── navigation/      Navbar, user menu
-│   └── ui/              Reusable primitives (3D card, carousel, spotlight, …)
-├── lib/
-│   ├── data/flights.ts  Single data seam: Supabase when configured, mock otherwise
-│   ├── booking/         Booking state + shared types
-│   ├── mock/            Mock flights and deterministic seat maps
-│   ├── supabase/ stripe/ resend/ opensky/   Service clients + `isXConfigured()` guards
-│   └── email/           Confirmation email template
-├── supabase/            Schema migration, seed data, setup guide
-└── proxy.ts             Refreshes the Supabase session cookie per request
-```
+| `GET /api/flights` | List flights |
+| `GET /api/flights/[id]` | Single flight details |
+| `GET /api/flights/[id]/seats` | Seat availability map |
+| `GET /api/stats` | Live travel statistics |
+| `POST /api/bookings/intent` | Create payment intent |
+| `POST /api/bookings` | Complete a booking |
+| `GET /api/bookings/[ref]?email=` | Look up a booking |
 
 ---
 
 ## Services
 
-All four are free-tier and independent — set up only the ones you want. Full step-by-step setup lives in [`frontend/supabase/README.md`](frontend/supabase/README.md); the variables themselves are documented in [`frontend/.env.example`](frontend/.env.example).
+Airflow works with optional services that enhance the experience. If not configured, the platform gracefully falls back to demo data.
 
-| Service | Used for | Without it |
+| Service | Purpose | Without it |
 | --- | --- | --- |
-| **Supabase** | Flights, bookings, passengers, auth | Mock flights; bookings aren't persisted and lookup returns 501 |
-| **Stripe** | Payment step (test mode) | Payment step is skipped and a booking ref is generated directly |
-| **Resend** | Confirmation emails | No email sent (best-effort either way — it never fails a booking) |
-| **OpenSky** | Real live aircraft count | Stats are simulated on a time-of-day curve |
+| **Supabase** | Flights, bookings, passengers, auth | Flights use demo data; bookings aren't saved |
+| **Stripe** | Payment processing | Booking completes without real payment |
+| **Resend** | Confirmation emails | No email is sent |
+| **OpenSky** | Live flight statistics | Stats are simulated |
 
-To wire up the database: run `frontend/supabase/migrations/0001_init.sql` then `frontend/supabase/seed.sql` in the Supabase SQL editor. Both are re-runnable.
+To set up the database, run the SQL files in Supabase:
 
-Tables: `flights` (inventory) · `bookings` (ref, contact, total, PaymentIntent) · `passengers` (one row per traveler, carries the seat and a unique seat-per-flight index).
+```bash
+frontend/supabase/migrations/0001_init.sql
+frontend/supabase/seed.sql
+```
 
-Stripe test card: `4242 4242 4242 4242`, any future expiry, any CVC.
+**Test payment card:**
+
+```
+4242 4242 4242 4242
+```
+
+Any future expiry date and any valid CVC work in test mode.
 
 ---
 
-## Mobile app
+## Tech Stack
+
+- **Next.js 16** with React 19
+- **Tailwind v4** for styling
+- **TypeScript** for type safety
+- **Supabase** for backend and auth
+- **Stripe** for secure payments
+- **Resend** for email delivery
+- **OpenSky** for live flight data
+
+---
+
+## Project Structure
 
 ```
-mobile/lib/
-├── data/       Mock flights, seat map, simulated stats service
-├── models/     Flight, Passenger, Seat, Stats
-├── screens/    Home, search, flights, schedule, details, help
-│   └── booking/  Passengers → seats → payment → confirmation
-├── state/      Booking controller
-├── theme/      Light/dark theme (system-mode toggle in the app bar)
-└── widgets/    App scaffold, brutalist primitives, live stats
+frontend/
+├── app/                 Pages and API routes
+├── components/          Booking flow and UI components
+├── hooks/               Shared React hooks
+├── lib/
+│   ├── booking/         Booking state and types
+│   ├── data/            Flight data and service integration
+│   ├── mock/            Demo flights and seat maps
+│   ├── email/           Email templates
+│   ├── supabase/        Database client
+│   ├── stripe/          Payment client
+│   ├── resend/          Email client
+│   └── opensky/         Stats integration
+├── supabase/            Database migrations and setup
+└── proxy.ts             Session management
 ```
 
-Requires the Flutter SDK (Dart `^3.12.0`).
+---
+
+## Notes
+
+- The platform is fully functional with demo data—no external services required to get started.
+- All bookings and user data remain local during development and testing.
+- Payment processing is secure in production and safely simulated in demo mode.
+
