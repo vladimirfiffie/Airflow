@@ -1,158 +1,257 @@
+"use client";
+
+import { ArrowRight, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, Plane } from "lucide-react";
-import { getFlight } from "@/lib/data/flights";
+import { useEffect, useMemo, useState } from "react";
 
-// Static fallbacks when DB doesn't have these fields populated; harmless when
-// real values are present.
-const gateByFlight: Record<string, string> = {
-  AF1001: "A12",
-  AF2204: "B4",
-  AF3320: "C9",
-  AF4892: "D2",
-};
+import FavoriteToggle from "@/components/favorites/favorite-toggle";
+import type { FlightOffer } from "@/lib/mock/flights";
+import { getSavedFlightIds } from "@/lib/favorites";
 
-const aircraftByFlight: Record<string, string> = {
-  AF1001: "A321neo",
-  AF2204: "B737-8",
-  AF3320: "A220-300",
-  AF4892: "B737-9",
-};
+type SortKey = "price" | "depart" | "duration";
 
-export default async function FlightDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  const flight = await getFlight(id);
+function toMinutes(duration: string) {
+  const [hoursPart, minsPart] = duration.split(" ");
+  const hours = Number(hoursPart.replace("h", ""));
+  const mins = Number(minsPart.replace("m", ""));
+  return hours * 60 + mins;
+}
 
-  if (!flight) {
-    notFound();
-  }
+const inputStyle =
+  "w-full rounded-md border border-neutral-300 bg-white px-3 py-2.5 text-sm font-medium text-neutral-900 outline-none transition focus:border-orange-500 dark:border-neutral-800 dark:bg-neutral-950 dark:text-white";
 
-  const rows = [
-    { label: "Flight", value: flight.flightNo },
-    { label: "Operator", value: flight.airline },
-    { label: "Departure", value: `${flight.fromCode} · ${flight.departTime}` },
-    { label: "Arrival", value: `${flight.toCode} · ${flight.arriveTime}` },
-    { label: "Duration", value: flight.duration },
-    { label: "Stops", value: flight.stops === 0 ? "Non-stop" : `${flight.stops}` },
-    { label: "Gate", value: gateByFlight[flight.flightNo] ?? "TBD" },
-    { label: "Aircraft", value: aircraftByFlight[flight.flightNo] ?? "TBD" },
-    { label: "Seats left", value: `${flight.seatsLeft}` },
-  ];
+export default function SearchClient({ flights }: { flights: FlightOffer[] }) {
+  const airportOptions = useMemo(
+    () =>
+      Array.from(new Set(flights.flatMap((f) => [f.fromCode, f.toCode]))).sort(),
+    [flights],
+  );
+
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [maxPrice, setMaxPrice] = useState(400);
+  const [nonStopOnly, setNonStopOnly] = useState(false);
+  const [savedOnly, setSavedOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<SortKey>("price");
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    setSavedIds(getSavedFlightIds());
+  }, []);
+
+  const results = useMemo(() => {
+    const filtered = flights.filter((flight) => {
+      if (from && flight.fromCode !== from) return false;
+      if (to && flight.toCode !== to) return false;
+      if (flight.priceUsd > maxPrice) return false;
+      if (nonStopOnly && flight.stops > 0) return false;
+      if (savedOnly && !savedIds.includes(flight.id)) return false;
+      return true;
+    });
+
+    return [...filtered].sort((a, b) => {
+      if (sortBy === "price") return a.priceUsd - b.priceUsd;
+      if (sortBy === "depart") return a.departTime.localeCompare(b.departTime);
+      return toMinutes(a.duration) - toMinutes(b.duration);
+    });
+  }, [flights, from, maxPrice, nonStopOnly, savedIds, savedOnly, sortBy, to]);
+
+  const handleFavoriteToggle = (flightId: string, saved: boolean) => {
+    setSavedIds((current) =>
+      saved ? [...new Set([...current, flightId])] : current.filter((id) => id !== flightId),
+    );
+  };
 
   return (
-    <div>
-      {/* Hero header — airline-info-screen feel */}
-      <section className="relative overflow-hidden border-b border-neutral-200 dark:border-neutral-900">
-        <div className="absolute inset-0 grid-lines opacity-50" aria-hidden />
-        <div className="relative mx-auto max-w-5xl px-4 py-16 md:px-8 md:py-24">
-          <Link
-            href="/search"
-            className="inline-flex items-center gap-2 text-sm font-bold text-neutral-600 transition hover:text-orange-500 dark:text-neutral-400"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to search
-          </Link>
-
-          <p className="mono mt-10 text-xs text-neutral-500 dark:text-neutral-400">
-            {flight.flightNo} · {flight.airline.toUpperCase()}
-          </p>
-
-          <h1 className="display mt-4 text-6xl font-black text-neutral-950 md:text-[120px] dark:text-white">
-            <span className="mono">{flight.fromCode}</span>
-            <span className="mx-3 text-orange-500 md:mx-6">→</span>
-            <span className="mono">{flight.toCode}</span>
-          </h1>
-
-          <p className="mono mt-6 text-sm text-neutral-600 dark:text-neutral-400">
-            {flight.departTime} → {flight.arriveTime} · {flight.duration} ·{" "}
-            {flight.stops === 0 ? "NON-STOP" : `${flight.stops} STOP`}
-          </p>
+    <>
+      <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6 dark:border-neutral-900 dark:bg-neutral-950">
+        <div className="mb-5 flex items-center gap-2">
+          <SlidersHorizontal className="h-4 w-4 text-orange-500" />
+          <p className="eyebrow !text-neutral-500 dark:!text-neutral-400">Filters</p>
         </div>
-      </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-12 md:px-8">
-        {/* Price banner */}
-        <div className="flex flex-col items-start justify-between gap-6 rounded-2xl bg-neutral-950 p-8 text-white md:flex-row md:items-center md:p-10">
-          <div>
-            <p className="mono text-xs text-neutral-400">FROM</p>
-            <p className="display mono mt-1 text-6xl font-black text-orange-500 md:text-7xl">
-              ${flight.priceUsd}
+        <div className="grid gap-4 md:grid-cols-5">
+          <label className="space-y-2 text-sm">
+            <span className="font-bold text-neutral-700 dark:text-neutral-300">From</span>
+            <select value={from} onChange={(e) => setFrom(e.target.value)} className={inputStyle}>
+              <option value="">Any airport</option>
+              {airportOptions.map((code) => (
+                <option key={code} value={code}>
+                  {code}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="space-y-2 text-sm">
+            <span className="font-bold text-neutral-700 dark:text-neutral-300">To</span>
+            <select value={to} onChange={(e) => setTo(e.target.value)} className={inputStyle}>
+              <option value="">Any airport</option>
+              {airportOptions.map((code) => (
+                <option key={code} value={code}>
+                  {code}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="space-y-2 text-sm">
+            <span className="font-bold text-neutral-700 dark:text-neutral-300">
+              Max price <span className="mono text-orange-500">${maxPrice}</span>
+            </span>
+            <input
+              type="range"
+              min={100}
+              max={500}
+              step={10}
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              className="mt-3 w-full accent-orange-500"
+            />
+          </label>
+
+          <label className="space-y-2 text-sm">
+            <span className="font-bold text-neutral-700 dark:text-neutral-300">Sort by</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortKey)}
+              className={inputStyle}
+            >
+              <option value="price">Lowest price</option>
+              <option value="depart">Departure time</option>
+              <option value="duration">Shortest duration</option>
+            </select>
+          </label>
+
+          <label className="flex items-end gap-3 pb-2">
+            <input
+              type="checkbox"
+              checked={nonStopOnly}
+              onChange={(e) => setNonStopOnly(e.target.checked)}
+              className="h-4 w-4 rounded accent-orange-500"
+            />
+            <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300">
+              Non-stop only
+            </span>
+          </label>
+        </div>
+
+        <div className="mt-6 flex items-center justify-between border-t border-neutral-200 pt-5 dark:border-neutral-900">
+          <div className="flex items-center gap-3">
+            <p className="mono text-xs text-neutral-500 dark:text-neutral-400">
+              {results.length} {results.length === 1 ? "FLIGHT" : "FLIGHTS"} FOUND
             </p>
-            <p className="mt-2 mono text-xs text-neutral-400">
-              {flight.seatsLeft} SEATS REMAINING
-            </p>
+            {savedIds.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setSavedOnly((current) => !current)}
+                className={
+                  "rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] transition " +
+                  (savedOnly
+                    ? "border-orange-500 bg-orange-500 text-white"
+                    : "border-neutral-300 text-neutral-600 hover:border-neutral-900 dark:border-neutral-700 dark:text-neutral-300 dark:hover:border-white")
+                }
+              >
+                {savedOnly ? "Saved only" : `${savedIds.length} saved`}
+              </button>
+            )}
           </div>
-          <Link
-            href={`/booking/${flight.id}`}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-orange-500 px-8 py-4 text-base font-bold text-white transition hover:bg-orange-600 md:w-auto"
+
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">
+              <input
+                type="checkbox"
+                checked={savedOnly}
+                onChange={(e) => setSavedOnly(e.target.checked)}
+                className="h-4 w-4 rounded accent-orange-500"
+              />
+              Saved only
+            </label>
+            <button
+              type="button"
+              onClick={() => {
+                setFrom("");
+                setTo("");
+                setMaxPrice(400);
+                setNonStopOnly(false);
+                setSavedOnly(false);
+                setSortBy("price");
+              }}
+              className="text-sm font-bold text-neutral-600 transition hover:text-orange-500 dark:text-neutral-400"
+            >
+              Reset filters
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8 space-y-3">
+        {results.map((flight) => (
+          <article
+            key={flight.id}
+            className="group flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-white p-6 transition-colors hover:border-orange-500 md:flex-row md:items-center md:justify-between md:gap-6 dark:border-neutral-900 dark:bg-black dark:hover:border-orange-500"
           >
-            Book this flight
-            <ArrowRight className="h-5 w-5" />
-          </Link>
-        </div>
-
-        {/* Info table */}
-        <div className="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white dark:border-neutral-900 dark:bg-neutral-950">
-          {rows.map((row, i) => (
-            <div
-              key={row.label}
-              className={`flex items-center justify-between px-6 py-5 ${
-                i < rows.length - 1
-                  ? "border-b border-neutral-200 dark:border-neutral-900"
-                  : ""
-              }`}
-            >
-              <span className="mono text-xs text-neutral-500 uppercase tracking-widest dark:text-neutral-400">
-                {row.label}
-              </span>
-              <span className="mono text-sm font-bold text-neutral-950 dark:text-white">
-                {row.value}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* Policy cards */}
-        <div className="mt-6 grid gap-3 md:grid-cols-3">
-          {[
-            { title: "Carry-on", value: "1 personal + 1 cabin bag" },
-            { title: "Checked bag", value: "$35 first bag, each way" },
-            { title: "Changes", value: "Flexible up to 24h before" },
-          ].map((item) => (
-            <div
-              key={item.title}
-              className="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-900 dark:bg-neutral-950"
-            >
-              <p className="eyebrow !text-neutral-500 dark:!text-neutral-400">{item.title}</p>
-              <p className="mt-3 text-sm font-bold text-neutral-950 dark:text-white">
-                {item.value}
+            <div className="flex-1">
+              <p className="mono text-xs text-neutral-500 dark:text-neutral-400">
+                {flight.airline.toUpperCase()} · {flight.flightNo}
+              </p>
+              <h2 className="display mt-2 text-3xl font-black text-neutral-950 md:text-4xl dark:text-white">
+                <span className="mono">{flight.fromCode}</span>
+                <span className="mx-3 text-orange-500">→</span>
+                <span className="mono">{flight.toCode}</span>
+              </h2>
+              <p className="mt-2 mono text-sm text-neutral-600 dark:text-neutral-400">
+                {flight.departTime} → {flight.arriveTime} · {flight.duration} ·{" "}
+                {flight.stops === 0 ? "NON-STOP" : `${flight.stops} STOP`}
               </p>
             </div>
-          ))}
-        </div>
 
-        {/* Bottom actions */}
-        <div className="mt-10 flex flex-wrap gap-3">
-          <Link
-            href="/search"
-            className="inline-flex items-center gap-2 rounded-md border border-neutral-300 px-5 py-3 text-sm font-bold text-neutral-900 transition hover:border-neutral-950 dark:border-neutral-800 dark:text-white dark:hover:border-white"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to search
-          </Link>
-          <Link
-            href={`/booking/${flight.id}`}
-            className="inline-flex items-center gap-2 rounded-md bg-orange-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
-          >
-            Continue to booking
-            <Plane className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
-    </div>
+            <div className="flex items-end justify-between gap-6 md:flex-col md:items-end">
+              <div className="text-left md:text-right">
+                <p className="mono text-xs text-neutral-500 dark:text-neutral-400">FROM</p>
+                <p className="display mono text-3xl font-black text-orange-500 md:text-4xl">
+                  ${flight.priceUsd}
+                </p>
+                <p className="mt-1 mono text-xs text-neutral-500 dark:text-neutral-400">
+                  {flight.seatsLeft} SEATS LEFT
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <FavoriteToggle
+                  flightId={flight.id}
+                  compact
+                  onToggle={(saved) => handleFavoriteToggle(flight.id, saved)}
+                />
+                <Link
+                  href={`/flights/${flight.id}`}
+                  className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-bold text-neutral-900 transition hover:border-neutral-950 dark:border-neutral-800 dark:text-white dark:hover:border-white"
+                >
+                  Details
+                </Link>
+                <Link
+                  href={`/booking/${flight.id}`}
+                  className="inline-flex items-center gap-2 rounded-md bg-orange-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-orange-600"
+                >
+                  Book
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </article>
+        ))}
+
+        {results.length === 0 && (
+          <div className="rounded-2xl border-2 border-dashed border-neutral-300 p-16 text-center dark:border-neutral-800">
+            <p className="display text-3xl font-black text-neutral-950 dark:text-white">
+              No flights match.
+            </p>
+            <p className="mt-3 text-neutral-600 dark:text-neutral-400">
+              Try widening your criteria or resetting filters.
+            </p>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
